@@ -2,41 +2,33 @@ import java.util.*;
 
 public class Sicherheitssteuerung {
     public static void main(String[] args){
-
-//        byte a,b,c;
-//
-//        a = 12;
-//        b = 12;
-//        c = (byte) (a + b);
-
-
-
-        System.out.println("Ist Schalter 1 aktiv?");            // frägt User, ob der Schalter 1 aktiv ist
-        Scanner lever1IsOn_scanner = new Scanner(System.in);
+        
+        System.out.println("Ist Schalter 1 aktiv?");            // asks the user if lever 1 is active
+        Scanner lever1IsOn_scanner = new Scanner(System.in);    // answer has to be "true"
         boolean lever1IsOn = lever1IsOn_scanner.nextBoolean();
 
-        System.out.println("Ist Schalter 2 aktiv?");            // frägt User, ob der Schalter 2 aktiv ist
-        Scanner lever2IsOn_scanner = new Scanner(System.in);
+            System.out.println("Ist Schalter 2 aktiv?");            //  asks the user if lever 2 is active
+        Scanner lever2IsOn_scanner = new Scanner(System.in);        // answer has to be "true"
         boolean lever2IsOn = lever2IsOn_scanner.nextBoolean();
 
+        
         boolean LeversAreOn = false;
-
-        if ( (lever1IsOn) && (lever2IsOn) ) {     // gibt true aus, wenn beide Schalter an sind
+        if ( (lever1IsOn) && (lever2IsOn) ) {     // checks if both levers are on
             LeversAreOn = true;
             System.out.println("alle Schalter sind an");
 
         }
 
-        System.out.println("Ist das Gitter geschlossen?");            // frägt User, ob das Gitter geschlossen ist
+        System.out.println("Ist die Türe geschlossen?");            // asks the user if the gate to the machine is closed
         Scanner GitterGeschlossen_scanner = new Scanner(System.in);
         boolean GitterGeschlossen = GitterGeschlossen_scanner.nextBoolean();
 
-        System.out.println("Wie weit bist du in CM von der Maschine entfernt?");            // frägt User, wie viel CM er von der Maschine entfernt ist
+        System.out.println("Wie weit bist du in CM von der Maschine entfernt?");            // asks the user how far he is away from the machine in cm
         Scanner DistanceToPress_scanner = new Scanner(System.in);
         int DistanceToPress = DistanceToPress_scanner.nextInt();
 
-        if ( (LeversAreOn) && (GitterGeschlossen) && (DistanceToPress >= 100)) {             // Überprüfen der Vorraussezungen zum Start der Maschine
-            boolean startPress = true;
+        if ( (LeversAreOn) && (GitterGeschlossen) && (DistanceToPress >= 100)) {             // checks if all requirements are meet to start the machine
+            press.start //"turns on machine"
             System.out.println("Maschine startet");
 
 
