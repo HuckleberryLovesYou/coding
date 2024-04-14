@@ -17,7 +17,7 @@ public class profile {
         int weight = 80;
         double bmi = weight / (body_height * body_height);
         boolean isadult = false;
-        if (age >= 18) isadult = true;
+        if (age >= 18) {isadult = true};
 
         System.out.printf("%-24s%s%n","Vorname:",prename);
         System.out.printf("%-24s%s%n","Nachname:",surname);
