@@ -1,21 +1,23 @@
-###############################################################
-#        This code is inspired by ebola man
-#        https://www.youtube.com/@ebolaman_
-#        He made a similar program like this
-#        in C# and I thought it míght be a
-#        good idea to interpret it into phyton.
-#        The idea came from this video:
-#        https://www.youtube.com/watch?v=oQxAVIZdktU
-#        It's also the first time for me
-#        working with functions and f-Strings.
-#        So far I can say that I LOVE f-Strings.
-#        This code can be found at:
-#
+###########################################################################################################
+#        This code is inspired by ebola man                                                               #
+#        https://www.youtube.com/@ebolaman_                                                               #
+#        He made a similar program like this                                                              #
+#        in C# and I thought it míght be a                                                                #
+#        good idea to interpret it into phyton.                                                           #
+#        The idea came from this video:                                                                   #
+#        https://www.youtube.com/watch?v=oQxAVIZdktU                                                      #
+#        It's also the first time for me                                                                  #
+#        working with functions and f-Strings.                                                            #
+#        So far I can say that I LOVE f-Strings.                                                          #
+#        This code can be found at:                                                                       #
+#        https://github.com/HuckleberryLovesYou/coding/blob/main/vocational-school/phyton/geolocator.py   #
+#                                                                                                         #
+###########################################################################################################
 
 
 import requests
 import json
-
+import os
 
 
 
@@ -41,8 +43,17 @@ def ipinfo_request(ipinfo_request_requested_ip):
         return ipinfo_api_response_statuscode
 
 def main():
-    requested_ip = input("Bitte gib hier deine IP-Adresse ein\n\n")
-    ipinfo_api_response_statuscode = ipinfo_request(requested_ip)
+    while True:
+        requested_ip = input("Bitte gib hier deine IP-Adresse ein\n\n")
+        print("\n"*25)
+        if requested_ip == "":
+            print("\n" * 25)
+            exit("Process finished with exit code: UserMadeNoEntry")
+        else:
+            ipinfo_api_response_statuscode = ipinfo_request(requested_ip)
+            print(f"\n\n{ipinfo_api_response_statuscode=}\n")
+
+
 
 if __name__ == "__main__":
     main()
