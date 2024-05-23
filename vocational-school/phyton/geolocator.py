@@ -17,7 +17,7 @@
 
 import requests
 import json
-import os
+import time
 
 
 
@@ -34,8 +34,8 @@ def ipinfo_request(ipinfo_request_requested_ip):
     google_maps_link = f"https://www.google.com/maps/search/?api=1&query={ipinfo_api_response_coord_latitude},{ipinfo_api_response_coord_longitude}"
     print(f"The IP '{ipinfo_request_requested_ip}' is located in {ipinfo_api_response_json["postal"]} {ipinfo_api_response_json["city"]} in {ipinfo_api_response_json["region"]} in {ipinfo_api_response_json["country"]}")
     print(f"The coordinats are: {ipinfo_api_response_json["loc"]}")
-    print(f"Generated Google Maps Link: {google_maps_link}")
-    # print(f"The call uri was {requested_url}")
+    print(f"Generated Google Maps Link:\n{google_maps_link}")
+    # print(f"The call url was {requested_url}")
     if not ipinfo_api_response_statuscode == 200:
         print(f"API-Call failed\nYour api_call returned {ipinfo_api_response_statuscode} status code")
         return ipinfo_api_response_statuscode
@@ -48,6 +48,7 @@ def main():
         print("\n"*25)
         if requested_ip == "":
             print("\n" * 25)
+            time.sleep(1)
             exit("Process finished with exit code: UserMadeNoEntry")
         else:
             ipinfo_api_response_statuscode = ipinfo_request(requested_ip)

@@ -1,6 +1,5 @@
 import requests
 
-replace_or_add_symbol: str = ":"
 mac_address_array_all: list[str] = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "A", "B", "C",
                          "D", "E", "F"]
 
@@ -38,7 +37,7 @@ def check_mac_address(mac_address):
         return True
     else:
         print("Please enter a Mac Address with a length between 12 and 17\nSupported formats are like the following:\n")
-        print("D83ADDEE5522\nd83addee5522\nD8-3A-DD-EE-55-22\nD8:3A:DD:EE:55:22\nd8$3A$DdD$eE$55!22")
+        print("D83ADDEE5522\nd83addee5522\nD8-3A-DD-EE-55-22\nD8:3A:DD:EE:55:22\nd8$3A$DD$eE$55!22")
         return False
 
 
@@ -56,8 +55,8 @@ def mac_address_vendor(mac_address_vendor_api_mac_address, debug_enabled):  # us
 
 
 def main():
-    debug_mode_char = "§"
-    user_specified_symbol: str = input("Please enter your Symbol you want to add in or replace with:\n")
+    debug_mode_char: str = "§"
+    user_specified_symbol: str = input("Please enter your Symbol you want to add in or replace with. Leave clear if the mac should be without any spacing:\n")
     if user_specified_symbol[len(user_specified_symbol)-1] == debug_mode_char:
         user_specified_symbol = user_specified_symbol[:len(user_specified_symbol)-1]
         debug_enabled = True
@@ -65,12 +64,11 @@ def main():
     else:
         debug_enabled = False
     while True:
-        mac_address_input: str = input("\nPlease enter your valid MAC:\n")
+        mac_address_input: str = input(f"\nPlease enter your valid MAC to add or replace with the following before defined symbol '{user_specified_symbol}' :\n")
         print("\n" * 15)
         if check_mac_address(mac_address_input):
             mac_address_output: str = symbol_check_mac_address(mac_address_input, user_specified_symbol)  # also calls replace and add function
             print(mac_address_output)
-            print(debug_enabled)
             vendor, status_code = mac_address_vendor(mac_address_input, debug_enabled)
             print(vendor)
 
