@@ -1,3 +1,8 @@
+#########################################################
+#   inspired by 'Tech wit Tim' on Youtube               #
+#   https://www.youtube.com/watch?v=NpmFbWO6HPU&t=2507s #
+#########################################################
+
 import random
 user_score = 0
 system_score = 0
@@ -25,7 +30,7 @@ def generate_system_turn():
     return symbols[random.randint(0 , 2)]
 
 def print_standings():
-    print(f"The current standings are the following:\n######################################\n\n{user_score=}\t|\t{system_score=}\n\n######################################\n")
+    print(f"The current standings are the following:\n##############################################\n\n{user_score=:>7}\t|\t{system_score=:>7}\n\n##############################################\n")
 
 
 
