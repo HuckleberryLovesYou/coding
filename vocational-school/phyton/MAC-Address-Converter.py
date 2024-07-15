@@ -60,6 +60,7 @@ def main():
     if user_specified_symbol[len(user_specified_symbol)-1] == debug_mode_char:
         user_specified_symbol = user_specified_symbol[:len(user_specified_symbol)-1]
         debug_enabled = True
+        print("Entering debug mode because you have entered " + debug_mode_char + " stats will be shown")
         print(f"Entering debug mode because you have entered {debug_mode_char=}\nMore stats will be shown")
     else:
         debug_enabled = False
@@ -71,7 +72,6 @@ def main():
             print(mac_address_output)
             vendor, status_code = mac_address_vendor(mac_address_input, debug_enabled)
             print(vendor)
-
 
 if __name__ == "__main__":
     main()
