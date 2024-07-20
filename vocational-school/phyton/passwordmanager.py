@@ -23,10 +23,10 @@ def build_filepath():
 
 def check_for_file(filepath):
     if os.path.exists(filepath):
-        print("File found")
+        print("Database found")
         return True
     else:
-        print("No such file in directory")
+        print("No such database in directory")
         return False
 
 
@@ -55,7 +55,7 @@ def view():
                 index, title, username, password = line.split(":")
                 print(f"{index}:\t\tTitle: {title}\tUsername: {username} Password: {password}\n")
 
-def add():  #TODO: don't give away the same index twice
+def add():
     title = input("Title: ")
     username = input("Username: ")
     password = input("Password: ")
@@ -96,7 +96,6 @@ def main():
     while True:
         filepath = build_filepath()
         if check_for_file(filepath):
-            # master_pwd = input("Master Password: ")
             while True:
                 mode = input("Choose mode [view/add/remove] ").lower()
                 if mode == "view":
