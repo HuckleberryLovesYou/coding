@@ -1,3 +1,9 @@
+##############################################################
+#   inspired by 'Tech wit Tim' on Youtube                    #
+#   https://youtu.be/NpmFbWO6HPU?si=8hVa3zdyk6Gpb43_&t=12044 #
+##############################################################
+
+
 import turtle as tur
 import random as ran
 from time import sleep as sle
