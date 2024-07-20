@@ -72,7 +72,6 @@ def create_finish_line():
     finish_line.setpos(WIDTH // 2, FINISH_LINE)
 
 
-
 def create_turtles(colors):
     turtles = []
     spacing_x = WIDTH // (len(colors) + 1)
