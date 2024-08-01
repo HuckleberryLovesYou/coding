@@ -10,6 +10,7 @@ SPECIAL_CHARACTERS = r"!#$%&'()*+,-./;<=>?@[]^_`{|}~"
 #random
 
 def generate_password(password_length):
+    password_length = round(password_length)
     password = []
     for i in range(password_length):
         list_choice = r.randint(0 , 2)
