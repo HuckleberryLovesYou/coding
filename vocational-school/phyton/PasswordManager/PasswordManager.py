@@ -33,17 +33,6 @@ def get_filepath():
 
 
 
-
-def create_file(current_dir, database_name):
-    user_input_create_database: str = input("Do you want to create a new database instead [y/n]").lower()
-    if user_input_create_database == "y":
-        filepath = rf"{current_dir}\{database_name}.txt"
-        open(filepath, 'a').close()
-    main()
-
-
-
-
 def count_lines():
     with open(global_filename, "r") as passwords_file:
         amount_of_lines: int = 0
@@ -78,9 +67,9 @@ def add(**kwargs):
         lines = passwords_file.readlines()
         for line in lines: #TODO: Starts at 1 after hitting index 10(9)
             existing_indexes.append(line[0])
+
     try:
         index = int(existing_indexes[-1]) + 1
-
     except IndexError:
         index = 1
 
@@ -90,7 +79,7 @@ def add(**kwargs):
     return index, password
 
 
-def remove(index_to_remove):
+def remove(index_to_remove: int):
     existing_indexes = []
     with open(global_filename, "r") as passwords_file:
         lines = passwords_file.readlines()
@@ -103,7 +92,9 @@ def remove(index_to_remove):
             for line in lines:
                 passwords_file.write(line)
     except ValueError:
-        print("The index specified couldn't be found in the database")
+        index_to_remove_error: str = "The index specified couldn't be found in the database"
+        print(index_to_remove_error)
+        return index_to_remove_error
 
 
 
