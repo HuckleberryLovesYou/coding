@@ -1,15 +1,14 @@
 import random as r
 
 
+#Dependencies:
+#random
 
 LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 NUMBERS = "0123456789"
 SPECIAL_CHARACTERS = r"!#$%&'()*+,-./;<=>?@[]^_`{|}~"
 
-#Dependencies:
-#random
-
-def generate_password(password_length):
+def generate_password(password_length: int):
     password_length = round(password_length)
     password = []
     for i in range(password_length):
@@ -28,21 +27,3 @@ def generate_password(password_length):
     for i in password:
         password_string += i
     return password_string
-
-
-
-def main():
-    while True:
-        password_length = input("Enter length of password: ")
-        if password_length.isdigit():
-            password_length = int(password_length)
-            break
-        else:
-            print("Please enter a valid length")
-    password = generate_password(password_length)
-    print(password)
-    return
-
-
-if __name__ == '__main__':
-    main()
