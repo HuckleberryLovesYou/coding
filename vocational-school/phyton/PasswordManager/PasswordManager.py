@@ -16,11 +16,12 @@
 import os
 from PasswordGenerator import generate_password
 from tkinter.filedialog import askopenfilename
+import PasswordManagerCryptography
 
 global_filename: str = ""
 
-def get_filepath():
-    def check_for_file(filepath):
+def get_filepath(): #let the user select a .txt-file and writes it into global_filename
+    def check_for_file(filepath): #checks if file actually exists (might not be needed)
         if os.path.exists(filepath):
             print("Database found")
             return True
@@ -50,41 +51,66 @@ def view():
         with open(global_filename, "r") as passwords_file:
             for line in passwords_file.readlines():
                 index, title, username, password = line.split(":")
-                view_list.append(f"{index}:\t\tTitle: {title}\tUsername: {username} Password: {password}\n")
+                view_list.append(f"{index}:\t\tTitle: {title}\tUsername: {username} \tPassword: {password}\n")
             return view_list
 
+
 def add(**kwargs):
-    title = kwargs.get("title")
+    """If password_length is specified password is overwritten"""
+    title: str = kwargs.get("title")
+    title_column_count = title.count(":")
     username = kwargs.get("username")
+    username_column_count = title.count(":")
     password = kwargs.get("password")
-    password_length = kwargs.get("password_length")
-    if password_length != None:
-        password = generate_password(password_length)
+    password_column_count = title.count(":")
+    if title_column_count == 0 or username_column_count == 0 or password_column_count == 0:
+        password_length = kwargs.get("password_length")
+        if password_length != None:
+            if password_length.isdigit():
+                password_length = int(password_length)
+                password = generate_password(password_length)
+            else:
+                raise TypeError(f"expected type int, got {type(password_length)} in password_length instead")
 
 
-    existing_indexes = []
-    with open(global_filename, "r") as passwords_file:
-        lines = passwords_file.readlines()
-        for line in lines: #TODO: Starts at 1 after hitting index 10(9)
-            existing_indexes.append(line[0])
+        existing_indexes = []
+        with open(global_filename, "r") as passwords_file:
+            lines = passwords_file.readlines()
+            for line in lines: #TODO: Find a better way to make more indexes possible (current solution goes up to index 9999)
+                index_to_append: str = ""
+                index_to_append += f"{line[0]}"
+                if line[1].isdigit():
+                    index_to_append += f"{line[1]}"
+                    if line[2].isdigit():
+                        index_to_append += f"{line[2]}"
+                        if line[3].isdigit():
+                            index_to_append += f"{line[3]}"
+                existing_indexes.append(index_to_append)
+        try:
+            index = int(existing_indexes[-1]) + 1
+        except IndexError:
+            index = 1
+        with open(global_filename, "a") as passwords_file:
+            passwords_file.write(f"{index}:{title}:{username}:{password}\n")
+        print(f"Entry added at index {index}")
+        return index, password
+    else:
+        raise TypeError("Found column in string")
 
-    try:
-        index = int(existing_indexes[-1]) + 1
-    except IndexError:
-        index = 1
-
-    with open(global_filename, "a") as passwords_file:
-        passwords_file.write(f"{index}:{title}:{username}:{password}\n")
-    print(f"Entry added at index {index}")
-    return index, password
 
 
-def remove(index_to_remove: int):
+def remove(index_to_remove: int): #TODO: Find a better way to make more indexes possible (current solution goes up to index 9999)
     existing_indexes = []
     with open(global_filename, "r") as passwords_file:
         lines = passwords_file.readlines()
         for line in lines:
-            existing_indexes.append(line[0])
+            index_to_append: str = ""
+            index_to_append += f"{line[0]}"
+            if line[1].isdigit():
+                index_to_append += f"{line[1]}"
+                if line[2].isdigit():
+                    index_to_append += f"{line[2]}"
+            existing_indexes.append(index_to_append)
     try:
         line_to_remove = existing_indexes.index(index_to_remove)
         del lines[line_to_remove]
@@ -92,9 +118,8 @@ def remove(index_to_remove: int):
             for line in lines:
                 passwords_file.write(line)
     except ValueError:
-        index_to_remove_error: str = "The index specified couldn't be found in the database"
-        print(index_to_remove_error)
-        return index_to_remove_error
+        print("The index specified couldn't be found in the database")
+
 
 
 
@@ -103,7 +128,22 @@ def main():
         filepath, file_found = get_filepath()
         if file_found:
             while True:
-                mode = input("Choose mode [view/add/remove/q to quit] ").lower()
+                master_password = input("Enter Master Password ['d' to enable debug]: ").lower()
+                key = PasswordManagerCryptography.convert_master_password_to_key(master_password)
+                if master_password == "d":
+                    print("Enabling Debug Mode")
+                    print("Enter password to encrypt the file with")
+                    master_password = input("Enter Master Password: ")
+                    key = PasswordManagerCryptography.convert_master_password_to_key(master_password)
+                    PasswordManagerCryptography.encrypt_database(global_filename, key)
+                    print("File encrypted")
+                    print("Disabling debug mode")
+                if PasswordManagerCryptography.decrypt_database(global_filename, key):
+                    break
+            print("Database decrypted")
+            print("If program is now closed without the use of 'q to quit', the database needs to be repaired in debug mode!")
+            while True:
+                mode = input("Choose mode [view/add/remove/q to quit]: ").lower()
                 if mode == "view":
                     view_list = view()
                     for line in view_list:
@@ -115,24 +155,26 @@ def main():
                     if password == "G":
                         while True:
                             generate_password_length = input("Enter password length [8-inf]: ")
-                            if generate_password_length.isdigit():
-                                generate_password_length = int(generate_password_length)
-                                if generate_password_length >= 8:
-                                    index, generated_password = add(title=title, username=username, password_length=generate_password_length)
-                                    break
-                                else:
-                                    print("Please enter a number between 8 and infinite")
-                            else:
-                                print("Please enter a valid number")
+                            index, generated_password = add(title=title, username=username, password_length=generate_password_length)
+                            break
+
                     else:
                         index, generated_password = add(title=title, username=username, password=password)
                     print(f"Entry added at index {index}")
                     if generated_password != password:
                         print("Your password is set to ", generated_password)
                 elif mode == "remove":
-                    index_to_remove = input("Enter index to delete: ")
-                    remove(index_to_remove)
+                    while True:
+                        index_to_remove = input("Enter index to delete: ")
+                        if index_to_remove.isdigit():
+                            index_to_remove = int(index_to_remove)
+                            remove(index_to_remove)
+                            break
+                        else:
+                            print("Please enter a valid number")
                 elif mode == "q":
+                    PasswordManagerCryptography.encrypt_database(global_filename, PasswordManagerCryptography.convert_master_password_to_key(master_password))
+                    print("Database encrypted")
                     exit("User ended the program")
                 else:
                     print("Enter a valid mode")
