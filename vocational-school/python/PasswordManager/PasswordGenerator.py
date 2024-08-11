@@ -1,4 +1,7 @@
 import random as r
+from string import ascii_letters
+from string import digits
+from string import punctuation
 
 #Dependencies:
 #random
@@ -6,9 +9,9 @@ import random as r
 # DO NOT USE IT TO STORE ANY IMPORTANT DATA
 # THIS IS JUST A FUN PROJECT NOT MEANT TO BE USED
 
-LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-NUMBERS = "0123456789"
-SPECIAL_CHARACTERS = r"!#$%&'()*+,-./;<=>?@[]^_`{|}~"
+LETTERS = ascii_letters #52 chars
+NUMBERS = digits #10 chars
+SPECIAL_CHARACTERS = punctuation #32 chars
 
 def generate_password(password_length: int):
     password_length = round(password_length)
