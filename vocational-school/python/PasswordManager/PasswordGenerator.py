@@ -14,7 +14,7 @@ from string import punctuation
 
 LETTERS = ascii_letters #52 chars
 NUMBERS = digits #10 chars
-SPECIAL_CHARACTERS = punctuation #32 chars
+SPECIAL_CHARACTERS = punctuation.replace(":", "") #32 chars
 
 def generate_password(password_length, letters=True, numbers=True, special=True):
     if not letters and not numbers and not special:
@@ -25,7 +25,7 @@ def generate_password(password_length, letters=True, numbers=True, special=True)
     password = []
     current_password_length: int = 0
     while password_length > current_password_length:
-        list_choice = r.randint(0 , 2) #generates a value between 0 and 2. This is used to generate evenly often usage of letters, numbers and special charaters
+        list_choice = r.randint(0 , 2) #generates a value between 0 and 2. This is used to generate evenly often usage of letters, numbers and special characters
         if list_choice == 0: #LETTERS string has value 0
             if letters:
                 character = LETTERS[r.randint(0, len(LETTERS)-1)]
