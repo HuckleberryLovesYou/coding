@@ -1,3 +1,16 @@
+#############################################################
+#   inspired by 'Tech wit Tim' on Youtube                   #
+#   https://youtu.be/NpmFbWO6HPU?si=NUpQHy3AY0X9-qJh&t=4008 #
+#############################################################
+
+#Dependencies:
+#base64
+#cryptography ## can be installed using 'pip install cryptography'
+
+# DO NOT USE IT TO STORE ANY IMPORTANT DATA
+# THIS IS JUST A FUN PROJECT NOT MEANT TO BE USED
+
+
 import base64
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
@@ -59,4 +72,6 @@ def decrypt_database(filename, key):
 
 
 #DEBUG
+#This is sometimes needed, if the program is quit - without the use of 'q to quit', while the database is already encrypted
+
 #encrypt_database("passwords.txt", convert_master_password_to_key("password"))
