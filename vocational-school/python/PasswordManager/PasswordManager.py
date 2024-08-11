@@ -54,7 +54,7 @@ def view():
             return view_list
 
 
-def add(**kwargs):
+def add(letters=True, numbers=True, special=True, **kwargs):
     """If password_length is specified password is overwritten"""
     title: str = kwargs.get("title")
     title_column_count = title.count(":")
@@ -67,7 +67,7 @@ def add(**kwargs):
         if password_length != None:
             if password_length.isdigit():
                 password_length = int(password_length)
-                password = generate_password(password_length)
+                password = generate_password(password_length, letters=letters, numbers=numbers, special=special)
             else:
                 raise TypeError(f"expected type int, got {type(password_length)} in password_length instead")
 
