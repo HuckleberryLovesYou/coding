@@ -1,11 +1,20 @@
-import time
+#############################################################
+#   inspired by 'NeuralNine' on Youtube                     #
+#   https://youtu.be/iM3kjbbKHQU?si=5JzFwVoErJ51FYlz        #
+#############################################################
+
+
+#Dependencies:
+#PasswordGenerator.py
+#PasswordManagerCryptography.py
+#customtkinter # can be installed using 'pip install customtkinter'
+
+# DO NOT USE IT TO STORE ANY IMPORTANT DATA
+# THIS IS JUST A FUN PROJECT NOT MEANT TO BE USED
 
 import customtkinter
 import PasswordManager
 import PasswordManagerCryptography
-
-# DO NOT USE IT TO STORE ANY IMPORTANT DATA
-# NO ENCRYPTION HAPPENING HERE
 
 WIDTH, HEIGHT = 1000, 750
 FILE_SELECTED: bool = False
@@ -14,7 +23,7 @@ KEY = b""
 
 FILENAME = ""
 
-customtkinter.set_appearance_mode("dark") #might be changed to "system" later
+customtkinter.set_appearance_mode("dark")
 customtkinter.set_default_color_theme("dark-blue")
 
 root = customtkinter.CTk()
