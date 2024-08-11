@@ -152,10 +152,35 @@ def main():
                     username = input("Username: ")
                     password = input("Password ['G' to generate]: ")
                     if password == "G":
-                        while True:
-                            generate_password_length = input("Enter password length [8-inf]: ")
-                            index, generated_password = add(title=title, username=username, password_length=generate_password_length)
-                            break
+                        configure_password_generation = input("Configure password generation? [y/n]: ").lower()
+                        if configure_password_generation == "y":
+                            generate_letters = input("Enable the generation of letters? [y/n]: ").lower()
+                            generate_numbers = input("Enable the generation of numbers? [y/n]: ").lower()
+                            generate_special_characters = input("Enable the generation of special characters? [y/n]: ").lower()
+
+                            generate_letters_bool: bool = False
+                            generate_numbers_bool: bool = False
+                            generate_special_characters_bool: bool = False
+
+                            while not generate_letters_bool or not generate_numbers_bool or not generate_special_characters_bool:
+                                if generate_letters == "y":
+                                    generate_letters_bool = True
+                                if generate_numbers == "y":
+                                    generate_numbers_bool = True
+                                if generate_special_characters == "y":
+                                    generate_special_characters_bool = True
+                                break
+
+                            while True:
+                                generate_password_length = input("Enter password length [8-inf]: ")
+                                index, generated_password = add(title=title, username=username, password_length=generate_password_length, letters=generate_letters_bool, numbers=generate_numbers_bool, special=generate_special_characters_bool)
+                                break
+
+                        else:
+                            while True:
+                                generate_password_length = input("Enter password length [8-inf]: ")
+                                index, generated_password = add(title=title, username=username, password_length=generate_password_length)
+                                break
 
                     else:
                         index, generated_password = add(title=title, username=username, password=password)
