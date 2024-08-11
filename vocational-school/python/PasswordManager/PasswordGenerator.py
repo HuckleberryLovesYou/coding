@@ -5,6 +5,9 @@ from string import punctuation
 
 #Dependencies:
 #random
+#string.ascii_letters
+#string.digits
+#string.punctuation
 
 # DO NOT USE IT TO STORE ANY IMPORTANT DATA
 # THIS IS JUST A FUN PROJECT NOT MEANT TO BE USED
