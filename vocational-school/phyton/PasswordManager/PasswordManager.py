@@ -5,10 +5,9 @@
 
 #Dependencies:
 #os
-#Password_Generator
+#PasswordGenerator.py
+#PasswordManagerCryptography.py
 #tkinter
-
-
 
 # DO NOT USE IT TO STORE ANY IMPORTANT DATA
 # NO ENCRYPTION HAPPENING HERE
