@@ -1,8 +1,10 @@
 import random as r
 
-
 #Dependencies:
 #random
+
+# DO NOT USE IT TO STORE ANY IMPORTANT DATA
+# THIS IS JUST A FUN PROJECT NOT MEANT TO BE USED
 
 LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 NUMBERS = "0123456789"
