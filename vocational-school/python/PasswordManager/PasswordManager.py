@@ -62,7 +62,7 @@ def add(**kwargs):
     username_column_count = title.count(":")
     password = kwargs.get("password")
     password_column_count = title.count(":")
-    if title_column_count == 0 or username_column_count == 0 or password_column_count == 0:
+    if title_column_count == 0 and username_column_count == 0 and password_column_count == 0:
         password_length = kwargs.get("password_length")
         if password_length != None:
             if password_length.isdigit():
