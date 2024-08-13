@@ -2,6 +2,7 @@ import random as r
 from string import ascii_letters
 from string import digits
 from string import punctuation
+import argparse
 
 #Dependencies:
 #random
@@ -45,18 +46,24 @@ def generate_password(password_length, letters=True, numbers=True, special=True)
     return password_string
 
 
+def str2bool(input: str):
+    if input.lower() == "true":
+        return True
+    elif input.lower() == "false":
+        return False
+    else:
+        raise argparse.ArgumentTypeError("Boolean expected")
+
 
 def main():
-    while True:
-        password_length = input("Enter length of password: ")
-        if password_length.isdigit():
-            password_length = int(password_length)
-            break
-        else:
-            print("Please enter a valid length")
-    password = generate_password(password_length)
+    parser = argparse.ArgumentParser(description="This is a Password Generator using a PRNG to generate Password with/without letters, with/without numbers or with/without special charaters")
+    parser.add_argument("-l", "--length", required=True, action="store", dest="password_length", help="Define the length of your generated password", type=int)
+    parser.add_argument("-gl", "--generate-letters", required=False, default=True, action="store", dest="generate_letters", help="Enable the generation of letters [True/False] [Default: True]", type=str2bool)
+    parser.add_argument("-gn", "--generate-numbers", required=False, default=True, action="store", dest="generate_numbers", help="Enable the generation of numbers [True/False] [Default: True]", type=str2bool)
+    parser.add_argument("-gs", "--generate-special", required=False, default=True, action="store", dest="generate_special", help="Enable the generation of special character [True/False] [Default: True]", type=str2bool)
+    args = parser.parse_args()
+    password = generate_password(args.password_length, letters=args.generate_letters, numbers=args.generate_numbers, special=args.generate_special)
     print(password)
-    return
 
 
 if __name__ == '__main__':

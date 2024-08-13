@@ -59,14 +59,20 @@ def mac_address_vendor(mac_address_vendor_api_mac_address, debug_enabled):  # us
         print(f"{mac_address_vendor_api_call.__hash__()=}\n\n\n")
     return mac_address_vendor_api_call.text , mac_address_vendor_api_call.status_code
 
-
+def str2bool(input: str):
+    if input.lower() == "true":
+        return True
+    elif input.lower() == "false":
+        return False
+    else:
+        raise argparse.ArgumentTypeError("Boolean expected")
 
 def main():
     parser = argparse.ArgumentParser("This is a Converter which converts MAC Address Notation to a other one [e.g. 'E8-9C-25-DC-A5-EA' -> 'E8:9C:25:DC:A5:EA']\nIt will also lookup the vendor of the MAC Address\n\n")
     parser.add_argument("-m", "--Mac-Address", required=True, action="store", dest="mac_address", help="Provide MAC Address in supported format", type=str)
     parser.add_argument("-r", "--replace", required=False, default="-", action="store", dest="replace_symbol", help="Enter symbol for replacing [Default: '-']", type=str)
-    parser.add_argument("-l", "--lower", required=False, default=False, action="store", dest="lower", help="Parse 'True' to change the MAC Address to only lowercase. Don't specify if default is needed. [Default: False]", type=bool)
-    parser.add_argument("-d", "--debug", required=False, default=False, action="store", dest="enable_debug", help="Parse 'True' to enable the  debug mode. Don't specify if default is needed. [Default: False]", type=bool)
+    parser.add_argument("-l", "--lower", required=False, default=False, action="store", dest="lower", help="Parse 'True' to change the MAC Address to only lowercase. Don't specify if default is needed. [Default: False]", type=str2bool)
+    parser.add_argument("-d", "--debug", required=False, default=False, action="store", dest="enable_debug", help="Parse 'True' to enable the  debug mode. Don't specify if default is needed. [Default: False]", type=str2bool)
     args = parser.parse_args()
     user_specified_symbol: str = args.replace_symbol
     if args.lower:
