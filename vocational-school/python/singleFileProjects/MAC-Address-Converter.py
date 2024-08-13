@@ -1,4 +1,5 @@
 import requests
+import argparse
 
 mac_address_array_all: list[str] = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "A", "B", "C",
                          "D", "E", "F"]
@@ -55,23 +56,22 @@ def mac_address_vendor(mac_address_vendor_api_mac_address, debug_enabled):  # us
 
 
 def main():
-    debug_mode_char: str = "§"
-    user_specified_symbol: str = input("Please enter your Symbol you want to add in or replace with. Leave clear if the mac should be without any spacing:\n")
-    if user_specified_symbol[len(user_specified_symbol)-1] == debug_mode_char:
-        user_specified_symbol = user_specified_symbol[:len(user_specified_symbol)-1]
-        debug_enabled = True
-        print("Entering debug mode because you have entered " + debug_mode_char + " stats will be shown")
-        print(f"Entering debug mode because you have entered {debug_mode_char=}\nMore stats will be shown")
-    else:
-        debug_enabled = False
-    while True:
-        mac_address_input: str = input(f"\nPlease enter your valid MAC to add or replace with the following before defined symbol '{user_specified_symbol}' :\n")
-        print("\n" * 15)
-        if check_mac_address(mac_address_input):
-            mac_address_output: str = symbol_check_mac_address(mac_address_input, user_specified_symbol)  # also calls replace and add function
-            print(mac_address_output)
-            vendor, status_code = mac_address_vendor(mac_address_input, debug_enabled)
-            print(vendor)
+    parser = argparse.ArgumentParser("This is a Converter which converts MAC Address Notation to a other one [e.g. 'E8-9C-25-DC-A5-EA' -> 'E8:9C:25:DC:A5:EA']\nIt will also lookup the vendor of the MAC Address\n\n")
+    parser.add_argument("-m", "--Mac-Address", required=True, action="store", dest="mac_address", help="Provide MAC Address in supported format", type=str)
+    parser.add_argument("-r", "--replace", required=True, default="-", action="store", dest="replace_symbol", help="Enter symbol for replacing", type=str)
+    parser.add_argument("-d", "--debug", required=False, default=False, action="store", dest="enable_debug", help="Parse 'True' to enable the  debug mode. [Default: False]", type=bool)
+    args = parser.parse_args()
+    user_specified_symbol: str = args.replace_symbol
+    if args.enable_debug:
+        print(f"Entering debug mode.\nMore stats will be shown.")
+
+    mac_address: str = args.mac_address
+    print("\n" * 15)
+    if check_mac_address(mac_address):
+        mac_address_output: str = symbol_check_mac_address(mac_address, user_specified_symbol)  #calls replace and add function
+        print(mac_address_output)
+        vendor, status_code = mac_address_vendor(mac_address, args.enable_debug)
+        print(vendor)
 
 if __name__ == "__main__":
     main()
