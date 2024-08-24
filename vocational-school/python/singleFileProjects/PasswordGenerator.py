@@ -56,7 +56,7 @@ def str2bool(input: str):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="This is a Password Generator using a PRNG to generate Password with/without letters, with/without numbers or with/without special charaters")
+    parser = argparse.ArgumentParser(description="This is a Password Generator using a PRNG to generate Password with/without letters, with/without numbers or with/without special charaters\n\n\t©timmatheis-de")
     parser.add_argument("-l", "--length", required=True, action="store", dest="password_length", help="Define the length of your generated password", type=int)
     parser.add_argument("-gl", "--generate-letters", required=False, default=True, action="store", dest="generate_letters", help="Enable the generation of letters [True/False] [Default: True]", type=str2bool)
     parser.add_argument("-gn", "--generate-numbers", required=False, default=True, action="store", dest="generate_numbers", help="Enable the generation of numbers [True/False] [Default: True]", type=str2bool)

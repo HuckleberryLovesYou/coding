@@ -52,6 +52,7 @@ def mac_address_vendor(mac_address_vendor_api_mac_address, debug_enabled):  # us
     mac_address_vendor_api_url = "https://api.macvendors.com/" + str(mac_address_vendor_api_mac_address)
     mac_address_vendor_api_call = requests.get(mac_address_vendor_api_url)
     if debug_enabled:
+        print("Entering debug mode.\nMore stats will be shown.")
         print(f"\n\n\n{mac_address_vendor_api_call.status_code=}")
         print(f"{mac_address_vendor_api_call.elapsed=}")
         print(f"{mac_address_vendor_api_call.raw=}")
@@ -59,35 +60,24 @@ def mac_address_vendor(mac_address_vendor_api_mac_address, debug_enabled):  # us
         print(f"{mac_address_vendor_api_call.__hash__()=}\n\n\n")
     return mac_address_vendor_api_call.text , mac_address_vendor_api_call.status_code
 
-def str2bool(input: str):
-    if input.lower() == "true":
-        return True
-    elif input.lower() == "false":
-        return False
-    else:
-        raise argparse.ArgumentTypeError("Boolean expected")
-
 def main():
-    parser = argparse.ArgumentParser("This is a Converter which converts MAC Address Notation to a other one [e.g. 'E8-9C-25-DC-A5-EA' -> 'E8:9C:25:DC:A5:EA']\nIt will also lookup the vendor of the MAC Address\n\n")
+    parser = argparse.ArgumentParser("This is a Converter which converts MAC Address Notation to a other one [e.g. 'E8-9C-25-DC-A5-EA' -> 'E8:9C:25:DC:A5:EA']\nIt will also lookup the vendor of the MAC Address\n\n\t©timmatheis-de")
     parser.add_argument("-m", "--Mac-Address", required=True, action="store", dest="mac_address", help="Provide MAC Address in supported format", type=str)
     parser.add_argument("-r", "--replace", required=False, default="-", action="store", dest="replace_symbol", help="Enter symbol for replacing [Default: '-']", type=str)
-    parser.add_argument("-l", "--lower", required=False, default=False, action="store", dest="lower", help="Parse 'True' to change the MAC Address to only lowercase. Don't specify if default is needed. [Default: False]", type=str2bool)
-    parser.add_argument("-d", "--debug", required=False, default=False, action="store", dest="enable_debug", help="Parse 'True' to enable the  debug mode. Don't specify if default is needed. [Default: False]", type=str2bool)
+    parser.add_argument("-l", "--lower", required=False, default=False, action="store_true", dest="lower_boolean", help="Specify to change the MAC Address to only lowercase. [Default: False]")
+    parser.add_argument("-d", "--debug", required=False, default=False, action="store_true", dest="lower_boolean", help="Specify to enable the debug mode. [Default: False]")
     args = parser.parse_args()
     user_specified_symbol: str = args.replace_symbol
-    if args.lower:
+    if args.lower_boolean:
         global MAKE_LOWER
         MAKE_LOWER = True
 
-    if args.enable_debug:
-        print(f"Entering debug mode.\nMore stats will be shown.")
-
     mac_address: str = args.mac_address
-    print("\n" * 15)
+
     if check_mac_address(mac_address):
         mac_address_output: str = symbol_check_mac_address(mac_address, user_specified_symbol)  #calls replace and add function
         print(mac_address_output)
-        vendor, status_code = mac_address_vendor(mac_address, args.enable_debug)
+        vendor, status_code = mac_address_vendor(mac_address, args.lower_boolean)
         print(vendor)
 
 if __name__ == "__main__":
