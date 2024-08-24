@@ -152,7 +152,7 @@ def main():
         print(args)
 
     except:
-        print("No arguments found\nUsing interactiv mode instead")
+        print("No arguments found\nUsing interactive mode instead")
     while True:
         filepath, file_found = get_filepath()
         if file_found:
