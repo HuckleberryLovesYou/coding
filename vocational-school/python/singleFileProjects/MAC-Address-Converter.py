@@ -39,9 +39,15 @@ def symbol_check_mac_address(mac_address, user_specified_symbol):
         mac_address = replace(mac_address, user_specified_symbol)
     return mac_address
 
-def check_mac_address(mac_address):
-    if 11 < len(mac_address) < 18:
-        return True
+def is_valid_mac_address(mac_address:  str) -> bool:
+    """It checks if the given MAC Address is valid by checking if the length is between 12 and 17 and if the mac address
+    isn't 000000000000 or 00-00-00-00-00-00.
+    It also prints a message if the MAC Address is
+    invalid including supported mac address formats. It returns True if the MAC Address is valid, otherwise False."""
+
+    if 11 < len(mac_address) < 18 and mac_address != "000000000000" != "00-00-00-00-00-00":
+        if mac_address != "000000000000" or mac_address != "00-00-00-00-00-00" or mac_address != "00:00:00:00:00:00":
+            return True
     else:
         print("Please enter a Mac Address with a length between 12 and 17\nSupported formats are like the following:\n")
         print("D83ADDEE5522\nd83addee5522\nD8-3A-DD-EE-55-22\nD8:3A:DD:EE:55:22\nd8$3A$DD$eE$55!22")
