@@ -80,13 +80,6 @@ def main() -> None:
         global no_api
         no_api = True
 
-    mac_address: str = args.mac_address
-
-    if check_mac_address(mac_address):
-        mac_address_output: str = symbol_check_mac_address(mac_address, user_specified_symbol)  #calls replace and add function
-        print(mac_address_output)
-        vendor, status_code = mac_address_vendor(mac_address, args.lower_boolean)
-        print(vendor)
 
 if __name__ == "__main__":
     main()
