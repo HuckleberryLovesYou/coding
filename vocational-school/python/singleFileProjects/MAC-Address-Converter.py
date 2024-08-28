@@ -3,55 +3,14 @@ import argparse
 from tkinter.filedialog import askopenfilename
 from time import sleep
 
-MAKE_LOWER = False
+make_lower = False
 filename = ""
 only_mac = False
 no_api = False
+debug_enabled = False
 
-mac_address_array_all: list[str] = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "A", "B", "C",
+mac_address_letters: list[str] = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "A", "B", "C",
                          "D", "E", "F"]
-
-def add(mac_address: str, user_specified_symbol: str) -> str:
-    count: int = 0
-    amount_of_times_true: int = 0
-    for i in range(len(mac_address)):
-        if count == 2:
-            mac_address = mac_address[:i + amount_of_times_true] + user_specified_symbol + mac_address[i + amount_of_times_true:]
-            count = 0
-            amount_of_times_true += 1
-        count += 1
-    return mac_address
-
-
-def replace(mac_address: str, user_specified_symbol: str) -> str:
-    mac_address_output: str = ""
-    for i in range(len(mac_address)):
-        if not mac_address[i] in mac_address_array_all:
-            mac_address_output = mac_address_output + user_specified_symbol
-        else:
-            if MAKE_LOWER:
-                mac_address_lower = mac_address[i].lower()
-                mac_address_output = mac_address_output + str(mac_address_lower)
-            else:
-                mac_address_upper = mac_address[i].upper()
-                mac_address_output = mac_address_output + str(mac_address_upper)
-    return mac_address_output
-
-
-def mac_address_vendor(mac_address: str, debug_enabled: bool) -> tuple[str, int]:  # uses https://api.macvendors.com/ api to get the vendor of the mac
-    """Get the vendor of the MAC address by using the macvendors.com API.
-    It takes a MAC address as a string input and a boolean to determine, if debug is enabled.
-    It returns a tuple containing the vendor name (of type str) and the status code (of type int) of the API call."""
-    mac_address_vendor_api_url = "https://api.macvendors.com/" + mac_address
-    mac_address_vendor_api_call = requests.get(mac_address_vendor_api_url)
-    if debug_enabled:
-        print("Entering debug mode.\nMore stats will be shown.")
-        print(f"\n\n\n{mac_address_vendor_api_call.status_code=}")
-        print(f"{mac_address_vendor_api_call.elapsed=}")
-        print(f"{mac_address_vendor_api_call.raw=}")
-        print(f"{mac_address_vendor_api_call.reason=}")
-        print(f"{mac_address_vendor_api_call.__hash__()=}\n\n\n")
-    return mac_address_vendor_api_call.text , mac_address_vendor_api_call.status_code
 
 
 def generate_output_file(hostnames: list[str], ips: list[str], mac_addresses: list[str], vendors: list[str]) -> None:
@@ -85,10 +44,10 @@ def handle_csv_file(user_specified_symbol: str) -> None:
         ip_in_csv_file.append(columns[2])
         mac_address = columns[3]
         if is_valid_mac_address(mac_address):
-            mac_address = decide_convertion_algorithm(mac_address, user_specified_symbol)
+            mac_address = convert_mac_address(mac_address, user_specified_symbol)
             mac_addresses_in_csv_file.append(mac_address)
             if not no_api:
-                vendor, _ = mac_address_vendor(mac_address, debug_enabled=False)
+                vendor, _ = mac_address_vendor(mac_address)
                 vendors_in_csv_file.append(vendor)
                 sleep(1.2) #max. 2 api-requests per second
 
@@ -98,26 +57,74 @@ def handle_csv_file(user_specified_symbol: str) -> None:
     generate_output_file(hostnames_in_csv_file, ip_in_csv_file, mac_addresses_in_csv_file, vendors_in_csv_file)
 
 
-def decide_convertion_algorithm(mac_address: str, user_specified_symbol: str) -> str:
-    if mac_address[2] in mac_address_array_all:  # checks if there is already spacing between every 16bit
-        mac_address = add(mac_address, user_specified_symbol)
+def mac_address_vendor(mac_address) -> str | None:  # uses https://api.macvendors.com/ api to get the vendor of the mac
+    """Get the vendor of the MAC address by using the macvendors.com API.
+    It takes a MAC address as a string input and a boolean to determine, if debug is enabled.
+    It returns a tuple containing the vendor name (of type str) and the status code (of type int) of the API call."""
+    if not no_api:
+        mac_address_vendor_api_url = "https://api.macvendors.com/" + mac_address
+        mac_address_vendor_api_call = requests.get(mac_address_vendor_api_url)
+        mac_address_vendor_api_call_text = mac_address_vendor_api_call.text
+        if mac_address_vendor_api_call_text == '{"errors":{"detail":"Not Found"}}' or mac_address_vendor_api_call.status_code != 200:
+            print("API Lookup failed")
+            return "API Lookup failed. Not found."
+        if debug_enabled:
+            print("Entering debug mode.\nMore stats will be shown.")
+            print(f"\n\n\n{mac_address_vendor_api_call.status_code=}")
+            print(f"{mac_address_vendor_api_call.elapsed=}")
+            print(f"{mac_address_vendor_api_call.raw=}")
+            print(f"{mac_address_vendor_api_call.reason=}")
+            print(f"{mac_address_vendor_api_call.__hash__()=}\n\n\n")
+        return mac_address_vendor_api_call.text
     else:
-        mac_address = replace(mac_address, user_specified_symbol)
-    return mac_address
+        print("No API lookup, since --no-api switch.")
 
-def is_valid_mac_address(mac_address:  str) -> bool:
-    """It checks if the given MAC Address is valid by checking if the length is between 12 and 17 and if the mac address
-    isn't 000000000000 or 00-00-00-00-00-00.
+
+def is_valid_mac_address(mac_address: str) -> bool:
+    """It checks if the given MAC Address is valid by checking if the raw length is 12 and if the mac address
+    isn't 000000000000 or 00-00-00-00-00-00 or 00:00:00:00:00:00.
     It also prints a message if the MAC Address is
     invalid including supported mac address formats. It returns True if the MAC Address is valid, otherwise False."""
+    count: int = 0
+    for letter in mac_address:
+        if letter in mac_address_letters:
+            count += 1
 
-    if 11 < len(mac_address) < 18 and mac_address != "000000000000" != "00-00-00-00-00-00":
-        if mac_address != "000000000000" or mac_address != "00-00-00-00-00-00" or mac_address != "00:00:00:00:00:00":
+    if count == 12:
+        if not mac_address in ["000000000000", "00-00-00-00-00-00", "00:00:00:00:00:00"]:
             return True
     else:
-        print("Please enter a Mac Address with a length between 12 and 17\nSupported formats are like the following:\n")
+        print("Please enter a valid Mac Address \nSupported formats are like the following:\n")
         print("D83ADDEE5522\nd83addee5522\nD8-3A-DD-EE-55-22\nD8:3A:DD:EE:55:22\nd8$3A$DD$eE$55!22")
         return False
+
+
+def get_raw_mac_address(mac_address: str) -> str:
+    raw_mac_address: str = ""
+    for index, letter in enumerate(mac_address):
+        if letter in mac_address_letters:
+            raw_mac_address += mac_address[index]
+
+    return raw_mac_address
+
+
+def convert_mac_address(mac_address: str, user_specified_symbol: str) -> tuple[str, str] | None:
+    raw_mac_address: str = get_raw_mac_address(mac_address)
+    if is_valid_mac_address(raw_mac_address):
+        count: int = 0
+        amount_of_times_true: int = 0
+        for i in range(len(raw_mac_address)):
+            if count == 2:
+                raw_mac_address = raw_mac_address[:i + amount_of_times_true] + user_specified_symbol + raw_mac_address[i + amount_of_times_true:]
+                count = 0
+                amount_of_times_true += 1
+
+            count += 1
+
+        if make_lower:
+            raw_mac_address = raw_mac_address.lower()
+
+        return raw_mac_address,  mac_address_vendor(raw_mac_address)
 
 
 def main() -> None:
@@ -134,14 +141,18 @@ def main() -> None:
     mac_address: str = args.mac_address
     user_specified_symbol: str = args.replace_symbol
     if args.lower_boolean:
-        global MAKE_LOWER
-        MAKE_LOWER = True
+        global make_lower
+        make_lower = True
+    if args.debug_boolean:
+        global debug_enabled
+        debug_enabled = True
     if args.only_mac_boolean:
         global only_mac
         only_mac = True
     if args.no_api_boolean:
         global no_api
         no_api = True
+
 
     if args.file_boolean:
         global filename
@@ -156,12 +167,8 @@ def main() -> None:
             case ".json":
                 print("This filetype is still wip")
     else:
-        if is_valid_mac_address(mac_address):
-            mac_address_output: str = decide_convertion_algorithm(mac_address, user_specified_symbol)  #calls replace() and add()
-            print(mac_address_output)
-            if not no_api:
-                vendor, status_code = mac_address_vendor(mac_address, args.lower_boolean)
-                print(vendor)
+        mac_address, vendor = convert_mac_address(mac_address, user_specified_symbol)
+        print(f"MAC Address: {mac_address}\nVendor: {vendor}")
 
 if __name__ == "__main__":
     main()
