@@ -36,6 +36,53 @@ def replace(mac_address, user_specified_symbol):
     return mac_address_output
 
 def symbol_check_mac_address(mac_address, user_specified_symbol):
+
+
+def generate_output_file(hostnames: list[str], ips: list[str], mac_addresses: list[str], vendors: list[str]) -> None:
+    print("Generating output file...")
+    with open("output_mac_address_converter.txt", "a") as output_file:
+        if only_mac:
+            for i in range(len(mac_addresses)):
+                output_file.write(str(mac_addresses[i]) + "\n")
+        else:
+            if no_api:
+                for i in range(len(mac_addresses)):
+                    output_file.write(f"Hostname: {hostnames[i]}, IP: {ips[i]}, MAC: {mac_addresses[i]}\n")
+            else:
+                for i in range(len(mac_addresses)):
+                    output_file.write(f"Hostname: {hostnames[i]}, IP: {ips[i]}, MAC: {mac_addresses[i]}, Vendor: {vendors[i]}\n")
+
+
+def handle_csv_file(user_specified_symbol: str) -> None:
+    with open(filename, "r") as csv_file:
+        lines = csv_file.readlines()
+
+    hostnames_in_csv_file = []
+    ip_in_csv_file = []
+    mac_addresses_in_csv_file = []
+    vendors_in_csv_file = []
+    csv_file_length = len(lines)
+    mac_addresses_done: int = 0
+    for line in lines:
+        columns = line.split(",")
+        hostnames_in_csv_file.append(columns[1])
+        ip_in_csv_file.append(columns[2])
+        mac_address = columns[3]
+        if is_valid_mac_address(mac_address):
+            mac_address = decide_convertion_algorithm(mac_address, user_specified_symbol)
+            mac_addresses_in_csv_file.append(mac_address)
+            if not no_api:
+                vendor, _ = mac_address_vendor(mac_address, debug_enabled=False)
+                vendors_in_csv_file.append(vendor)
+                sleep(1.2) #max. 2 api-requests per second
+
+        mac_addresses_done += 1
+        print(f"{csv_file_length - mac_addresses_done} done. (00-00-00-00-00-00 will be skipped)", end="\r")
+
+    generate_output_file(hostnames_in_csv_file, ip_in_csv_file, mac_addresses_in_csv_file, vendors_in_csv_file)
+
+
+def decide_convertion_algorithm(mac_address: str, user_specified_symbol: str) -> str:
     if mac_address[2] in mac_address_array_all:  # checks if there is already spacing between every 16bit
         mac_address = add(mac_address, user_specified_symbol)
     else:
@@ -80,6 +127,25 @@ def main() -> None:
         global no_api
         no_api = True
 
+    if args.file_boolean:
+        global filename
+        filename = askopenfilename(title="Select csv-file to iterate through:", filetypes=[("CSV-Files" , "*.csv"), ("XML-Files", "*.xml"), ("JSON-Files", "*.json")])
+        filetype = filename.split(".")
+        filetype = f".{filetype[-1]}"
+        match filetype:
+            case ".csv":
+                handle_csv_file(user_specified_symbol)
+            case ".xml":
+                print("This filetype is still wip")
+            case ".json":
+                print("This filetype is still wip")
+    else:
+        if is_valid_mac_address(mac_address):
+            mac_address_output: str = decide_convertion_algorithm(mac_address, user_specified_symbol)  #calls replace() and add()
+            print(mac_address_output)
+            if not no_api:
+                vendor, status_code = mac_address_vendor(mac_address, args.lower_boolean)
+                print(vendor)
 
 if __name__ == "__main__":
     main()
