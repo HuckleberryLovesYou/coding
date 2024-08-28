@@ -13,6 +13,10 @@ mac_address_letters: list[str] = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "
                          "D", "E", "F"]
 
 
+class MacAddressInvalid(Exception):
+    def __init__(self, message: str):
+        print(message)
+
 def generate_output_file(hostnames: list[str], ips: list[str], mac_addresses: list[str], vendors: list[str]) -> None:
     print("Generating output file...")
     with open("output_mac_address_converter.txt", "a") as output_file:
@@ -93,11 +97,13 @@ def is_valid_mac_address(mac_address: str) -> bool:
     if count == 12:
         if not mac_address in ["000000000000", "00-00-00-00-00-00", "00:00:00:00:00:00"]:
             return True
-    else:
-        print("Please enter a valid Mac Address \nSupported formats are like the following:\n")
-        print("D83ADDEE5522\nd83addee5522\nD8-3A-DD-EE-55-22\nD8:3A:DD:EE:55:22\nd8$3A$DD$eE$55!22")
-        return False
 
+    print("Please enter a valid Mac Address \nSupported formats are like the following:\n")
+    print("D83ADDEE5522\nd83addee5522\nD8-3A-DD-EE-55-22\nD8:3A:DD:EE:55:22\nd8$3A$DD$eE$55!22")
+    if len(filename) == 0:
+        raise MacAddressInvalid("Invalid MAC Address submitted.")
+    else:
+        return False
 
 def get_raw_mac_address(mac_address: str) -> str:
     raw_mac_address: str = ""
