@@ -2,6 +2,9 @@ import requests
 import argparse
 
 MAKE_LOWER = False
+filename = ""
+only_mac = False
+no_api = False
 
 mac_address_array_all: list[str] = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "A", "B", "C",
                          "D", "E", "F"]
@@ -54,13 +57,28 @@ def is_valid_mac_address(mac_address:  str) -> bool:
         return False
 
 
+def main() -> None:
+    parser = argparse.ArgumentParser("This is a Converter which converts MAC Address Notation to a other one [e.g. 'E8-9C-25-DC-A5-EA' -> 'E8:9C:25:DC:A5:EA']\nIt will lookup the vendor of the MAC Address by default.\n\n\t©timmatheis-de")
+    parser.add_argument("-m", "--mac-address", required=True, action="store", dest="mac_address", help="Provide MAC Address in supported format.", type=str)
+    parser.add_argument("-r", "--replace", required=False, default="-", action="store", dest="replace_symbol", help="Enter symbol for replacing. [Default: '-']", type=str)
     parser.add_argument("-l", "--lower", required=False, default=False, action="store_true", dest="lower_boolean", help="Specify to change the MAC Address to only lowercase. [Default: False]")
     parser.add_argument("-d", "--debug", required=False, default=False, action="store_true", dest="lower_boolean", help="Specify to enable the debug mode. [Default: False]")
+    parser.add_argument("-f", "--file", required=False, default=False, action="store_true", dest="file_boolean", help="Specify to specify a file afterwards. Support file formats are: .csv [Default: False]")
+    parser.add_argument("-om", "--only-mac", required=False, default=False, action="store_true", dest="only_mac_boolean", help="Specify to change the output file to only include the Mac Addresses. [Default: False]")
+    parser.add_argument("-na", "--no-api", required=False, default=False, action="store_true", dest="no_api_boolean", help="Specify to skip the api lookup. [Default: False]")
     args = parser.parse_args()
+
+    mac_address: str = args.mac_address
     user_specified_symbol: str = args.replace_symbol
     if args.lower_boolean:
         global MAKE_LOWER
         MAKE_LOWER = True
+    if args.only_mac_boolean:
+        global only_mac
+        only_mac = True
+    if args.no_api_boolean:
+        global no_api
+        no_api = True
 
     mac_address: str = args.mac_address
 
