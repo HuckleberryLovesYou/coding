@@ -174,7 +174,10 @@ def main() -> None:
                 print("This filetype is still wip")
     else:
         mac_address, vendor = convert_mac_address(mac_address, user_specified_symbol)
-        print(f"MAC Address: {mac_address}\nVendor: {vendor}")
+        if no_api:
+            print(f"MAC Address: {mac_address}")
+        else:
+            print(f"MAC Address: {mac_address}\nVendor: {vendor}")
 
 if __name__ == "__main__":
     main()
