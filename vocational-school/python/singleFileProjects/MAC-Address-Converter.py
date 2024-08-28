@@ -1,5 +1,7 @@
 import requests
 import argparse
+from tkinter.filedialog import askopenfilename
+from time import sleep
 
 MAKE_LOWER = False
 filename = ""
@@ -9,7 +11,7 @@ no_api = False
 mac_address_array_all: list[str] = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "A", "B", "C",
                          "D", "E", "F"]
 
-def add(mac_address, user_specified_symbol):
+def add(mac_address: str, user_specified_symbol: str) -> str:
     count: int = 0
     amount_of_times_true: int = 0
     for i in range(len(mac_address)):
@@ -21,7 +23,7 @@ def add(mac_address, user_specified_symbol):
     return mac_address
 
 
-def replace(mac_address, user_specified_symbol):
+def replace(mac_address: str, user_specified_symbol: str) -> str:
     mac_address_output: str = ""
     for i in range(len(mac_address)):
         if not mac_address[i] in mac_address_array_all:
@@ -35,7 +37,21 @@ def replace(mac_address, user_specified_symbol):
                 mac_address_output = mac_address_output + str(mac_address_upper)
     return mac_address_output
 
-def symbol_check_mac_address(mac_address, user_specified_symbol):
+
+def mac_address_vendor(mac_address: str, debug_enabled: bool) -> tuple[str, int]:  # uses https://api.macvendors.com/ api to get the vendor of the mac
+    """Get the vendor of the MAC address by using the macvendors.com API.
+    It takes a MAC address as a string input and a boolean to determine, if debug is enabled.
+    It returns a tuple containing the vendor name (of type str) and the status code (of type int) of the API call."""
+    mac_address_vendor_api_url = "https://api.macvendors.com/" + mac_address
+    mac_address_vendor_api_call = requests.get(mac_address_vendor_api_url)
+    if debug_enabled:
+        print("Entering debug mode.\nMore stats will be shown.")
+        print(f"\n\n\n{mac_address_vendor_api_call.status_code=}")
+        print(f"{mac_address_vendor_api_call.elapsed=}")
+        print(f"{mac_address_vendor_api_call.raw=}")
+        print(f"{mac_address_vendor_api_call.reason=}")
+        print(f"{mac_address_vendor_api_call.__hash__()=}\n\n\n")
+    return mac_address_vendor_api_call.text , mac_address_vendor_api_call.status_code
 
 
 def generate_output_file(hostnames: list[str], ips: list[str], mac_addresses: list[str], vendors: list[str]) -> None:
