@@ -3,10 +3,12 @@ import argparse
 from tkinter.filedialog import askopenfilename
 from time import sleep
 
-make_lower = False
-filename = ""
-only_mac = False
-no_api = False
+
+make_lower: bool = False
+filename: str = ""
+only_mac: bool = False
+no_api: bool = False
+is_file_used: bool = False
 
 mac_address_letters: list[str] = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "A", "B", "C",
                          "D", "E", "F"]
@@ -15,7 +17,7 @@ mac_address_letters: list[str] = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "
 class MacAddressInvalid(Exception):
     def __init__(self, message: str):
         print(message)
-        print("Please enter a valid Mac Address \nSupported formats are like the following:\n")
+        print("Please enter a valid Mac Address with a length of 12 or more charactersi\nSupported formats are like the following:\n")
         print("D83ADDEE5522\nd83addee5522\nD8-3A-DD-EE-55-22\nD8:3A:DD:EE:55:22\nd8$3A$DD$eE$55!22")
 
 def generate_output_file(hostnames: list[str], ips: list[str], mac_addresses: list[str], vendors: list[str]) -> None:
@@ -41,7 +43,7 @@ def handle_csv_file(user_specified_symbol: str) -> None:
     ip_in_csv_file = []
     mac_addresses_in_csv_file = []
     vendors_in_csv_file = []
-    csv_file_length = len(lines)
+    csv_file_lines = len(lines)
     mac_addresses_done: int = 0
     for line in lines:
         columns = line.split(",")
@@ -56,7 +58,7 @@ def handle_csv_file(user_specified_symbol: str) -> None:
                 sleep(1.2) #max. 2 api-requests per second
 
         mac_addresses_done += 1
-        print(f"{csv_file_length - mac_addresses_done} done. (00-00-00-00-00-00 will be skipped)", end="\r")
+        print(f"{csv_file_lines - mac_addresses_done} left to do.", end="\r")
 
     generate_output_file(hostnames_in_csv_file, ip_in_csv_file, mac_addresses_in_csv_file, vendors_in_csv_file)
 
@@ -74,7 +76,8 @@ def mac_address_vendor(mac_address) -> str | None:  # uses https://api.macvendor
             return "API Lookup failed. Not found."
         return mac_address_vendor_api_call.text
     else:
-        print("No API lookup, since --no-api switch.")
+        if not is_file_used:
+            print("No API lookup, since --no-api switch.")
 
 
 def is_valid_mac_address(mac_address: str) -> bool:
@@ -90,7 +93,11 @@ def is_valid_mac_address(mac_address: str) -> bool:
     if count == 12:
         if not mac_address in ["000000000000", "00-00-00-00-00-00", "00:00:00:00:00:00"]:
             return True
-    raise MacAddressInvalid("Invalid MAC Address submitted.")
+    else:
+        if not is_file_used:
+            raise MacAddressInvalid("Invalid MAC Address submitted.")
+        else:
+            return False
 
 
 def get_raw_mac_address(mac_address: str) -> str:
@@ -107,23 +114,26 @@ def convert_mac_address(mac_address: str, user_specified_symbol: str) -> tuple[s
     if is_valid_mac_address(raw_mac_address):
         count: int = 0
         amount_of_times_true: int = 0
+        manipulated_mac_address = raw_mac_address
         for i in range(len(raw_mac_address)):
             if count == 2:
-                raw_mac_address = raw_mac_address[:i + amount_of_times_true] + user_specified_symbol + raw_mac_address[i + amount_of_times_true:]
+                manipulated_mac_address = manipulated_mac_address[:i + (amount_of_times_true * len(user_specified_symbol))] + user_specified_symbol + manipulated_mac_address[i + (amount_of_times_true * len(user_specified_symbol)):]
                 count = 0
                 amount_of_times_true += 1
 
             count += 1
 
         if make_lower:
-            raw_mac_address = raw_mac_address.lower()
+            manipulated_mac_address = raw_mac_address.lower()
+        else:
+            manipulated_mac_address = raw_mac_address.upper()
 
-        return raw_mac_address,  mac_address_vendor(raw_mac_address)
+        return manipulated_mac_address,  mac_address_vendor(raw_mac_address)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser("This is a Converter which converts MAC Address Notation to a other one [e.g. 'E8-9C-25-DC-A5-EA' -> 'E8:9C:25:DC:A5:EA']\nIt will lookup the vendor of the MAC Address by default.\n\n\t©timmatheis-de")
-    parser.add_argument("-m", "--mac-address", required=True, action="store", dest="mac_address", help="Provide MAC Address in supported format.", type=str)
+    parser.add_argument("-m", "--mac-address", required=False, action="store", dest="mac_address", help="Provide MAC Address in supported format.", type=str)
     parser.add_argument("-r", "--replace", required=False, default="-", action="store", dest="replace_symbol", help="Enter symbol for replacing. [Default: '-']", type=str)
     parser.add_argument("-l", "--lower", required=False, default=False, action="store_true", dest="lower_boolean", help="Specify to change the MAC Address to only lowercase. [Default: False]")
     parser.add_argument("-f", "--file", required=False, default=False, action="store_true", dest="file_boolean", help="Specify to specify a file afterwards. Support file formats are: .csv [Default: False]")
@@ -145,7 +155,8 @@ def main() -> None:
 
 
     if args.file_boolean:
-        global filename
+        global is_file_used, filename
+        is_file_used = True
         filename = askopenfilename(title="Select csv-file to iterate through:", filetypes=[("CSV-Files" , "*.csv"), ("XML-Files", "*.xml"), ("JSON-Files", "*.json")])
         filetype = filename.split(".")
         filetype = f".{filetype[-1]}"
