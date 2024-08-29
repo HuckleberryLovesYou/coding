@@ -49,10 +49,9 @@ def handle_csv_file(user_specified_symbol: str) -> None:
         ip_in_csv_file.append(columns[2])
         mac_address = columns[3]
         if is_valid_mac_address(mac_address):
-            mac_address = convert_mac_address(mac_address, user_specified_symbol)
+            mac_address, vendor = convert_mac_address(mac_address, user_specified_symbol)
             mac_addresses_in_csv_file.append(mac_address)
             if not no_api:
-                vendor, _ = mac_address_vendor(mac_address)
                 vendors_in_csv_file.append(vendor)
                 sleep(1.2) #max. 2 api-requests per second
 
@@ -93,12 +92,6 @@ def is_valid_mac_address(mac_address: str) -> bool:
             return True
     raise MacAddressInvalid("Invalid MAC Address submitted.")
 
-    print("Please enter a valid Mac Address \nSupported formats are like the following:\n")
-    print("D83ADDEE5522\nd83addee5522\nD8-3A-DD-EE-55-22\nD8:3A:DD:EE:55:22\nd8$3A$DD$eE$55!22")
-    if len(filename) == 0:
-        raise MacAddressInvalid("Invalid MAC Address submitted.")
-    else:
-        return False
 
 def get_raw_mac_address(mac_address: str) -> str:
     raw_mac_address: str = ""
