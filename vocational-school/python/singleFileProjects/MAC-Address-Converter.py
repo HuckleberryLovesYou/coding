@@ -15,6 +15,8 @@ mac_address_letters: list[str] = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "
 class MacAddressInvalid(Exception):
     def __init__(self, message: str):
         print(message)
+        print("Please enter a valid Mac Address \nSupported formats are like the following:\n")
+        print("D83ADDEE5522\nd83addee5522\nD8-3A-DD-EE-55-22\nD8:3A:DD:EE:55:22\nd8$3A$DD$eE$55!22")
 
 def generate_output_file(hostnames: list[str], ips: list[str], mac_addresses: list[str], vendors: list[str]) -> None:
     print("Generating output file...")
@@ -89,6 +91,7 @@ def is_valid_mac_address(mac_address: str) -> bool:
     if count == 12:
         if not mac_address in ["000000000000", "00-00-00-00-00-00", "00:00:00:00:00:00"]:
             return True
+    raise MacAddressInvalid("Invalid MAC Address submitted.")
 
     print("Please enter a valid Mac Address \nSupported formats are like the following:\n")
     print("D83ADDEE5522\nd83addee5522\nD8-3A-DD-EE-55-22\nD8:3A:DD:EE:55:22\nd8$3A$DD$eE$55!22")
