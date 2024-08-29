@@ -1,17 +1,30 @@
 import datetime
-import argparse
+import requests
+
+def get_version(major_version: str) -> str:
+    if major_version[-2] == "0":
+        last_digit: str = major_version[-1]
+        major_version = major_version[:-2] + last_digit
+    url: str = "https://www.home-assistant.io/blog/categories/release-notes/"
+    response: requests.Response = requests.get(url)
+    if response.status_code != 200:
+        raise Exception("Error while fetching the url")
+    response_text: str = str(response.text)
+    index = response_text.index(major_version)
+
+    return response_text[index:(index + (len(major_version) + 2))]
+
+
+def generate_name():
+    today: str = str(datetime.date.today())
+    major_version: str = today[:7].replace("-", ".")
+    latest_version = get_version(major_version)
+    return today + "_Update-" + latest_version.replace(".", "")
+
 
 def main():
-    parser = argparse.ArgumentParser(description="This is a Generator for a reasonable Backup-Name for Homeassistant")
-    parser.add_argument("-v", "--version", required=True, action="store", dest="version", help="Enter current bugfix-version-number [e.g. 2024.8.2 -> 2]")
-    args = parser.parse_args()
+    print(generate_name())
 
-    print(generate_name(args.version))
 
-def generate_name(version=None):
-    today: str = f"{datetime.date.today()}"
-    string: str = today + "_Update-" + today[:4] + today[6:7] + version
-    return string
-    
 if __name__ == '__main__':
     main()
