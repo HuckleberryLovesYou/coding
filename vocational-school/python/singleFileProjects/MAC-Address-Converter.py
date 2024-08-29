@@ -7,7 +7,6 @@ make_lower = False
 filename = ""
 only_mac = False
 no_api = False
-debug_enabled = False
 
 mac_address_letters: list[str] = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "A", "B", "C",
                          "D", "E", "F"]
@@ -72,13 +71,6 @@ def mac_address_vendor(mac_address) -> str | None:  # uses https://api.macvendor
         if mac_address_vendor_api_call_text == '{"errors":{"detail":"Not Found"}}' or mac_address_vendor_api_call.status_code != 200:
             print("API Lookup failed")
             return "API Lookup failed. Not found."
-        if debug_enabled:
-            print("Entering debug mode.\nMore stats will be shown.")
-            print(f"\n\n\n{mac_address_vendor_api_call.status_code=}")
-            print(f"{mac_address_vendor_api_call.elapsed=}")
-            print(f"{mac_address_vendor_api_call.raw=}")
-            print(f"{mac_address_vendor_api_call.reason=}")
-            print(f"{mac_address_vendor_api_call.__hash__()=}\n\n\n")
         return mac_address_vendor_api_call.text
     else:
         print("No API lookup, since --no-api switch.")
@@ -138,7 +130,6 @@ def main() -> None:
     parser.add_argument("-m", "--mac-address", required=True, action="store", dest="mac_address", help="Provide MAC Address in supported format.", type=str)
     parser.add_argument("-r", "--replace", required=False, default="-", action="store", dest="replace_symbol", help="Enter symbol for replacing. [Default: '-']", type=str)
     parser.add_argument("-l", "--lower", required=False, default=False, action="store_true", dest="lower_boolean", help="Specify to change the MAC Address to only lowercase. [Default: False]")
-    parser.add_argument("-d", "--debug", required=False, default=False, action="store_true", dest="debug_boolean", help="Specify to enable the debug mode. [Default: False]")
     parser.add_argument("-f", "--file", required=False, default=False, action="store_true", dest="file_boolean", help="Specify to specify a file afterwards. Support file formats are: .csv [Default: False]")
     parser.add_argument("-om", "--only-mac", required=False, default=False, action="store_true", dest="only_mac_boolean", help="Specify to change the output file to only include the Mac Addresses. [Default: False]")
     parser.add_argument("-na", "--no-api", required=False, default=False, action="store_true", dest="no_api_boolean", help="Specify to skip the api lookup. [Default: False]")
@@ -149,9 +140,6 @@ def main() -> None:
     if args.lower_boolean:
         global make_lower
         make_lower = True
-    if args.debug_boolean:
-        global debug_enabled
-        debug_enabled = True
     if args.only_mac_boolean:
         global only_mac
         only_mac = True
