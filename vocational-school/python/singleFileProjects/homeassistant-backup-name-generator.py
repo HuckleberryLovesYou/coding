@@ -15,14 +15,14 @@ def get_version(major_version: str) -> str:
     return response_text[index:(index + (len(major_version) + 2))]
 
 
-def generate_name():
+def generate_name() -> str:
     today: str = str(datetime.date.today())
     major_version: str = today[:7].replace("-", ".")
-    latest_version = get_version(major_version)
+    latest_version: str = get_version(major_version)
     return today + "_Update-" + latest_version.replace(".", "")
 
 
-def main():
+def main() -> None:
     print(generate_name())
 
 
