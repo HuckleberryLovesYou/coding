@@ -1,14 +1,11 @@
 import random as r
-from string import ascii_letters
-from string import digits
-from string import punctuation
+from string import ascii_letters, digits, punctuation
 import argparse
 
 #Dependencies:
 #random
-#string.ascii_letters
-#string.digits
-#string.punctuation
+#string.ascii_letters, digits, punctuation
+#argparse
 
 LETTERS = ascii_letters #52 chars
 NUMBERS = digits #10 chars
