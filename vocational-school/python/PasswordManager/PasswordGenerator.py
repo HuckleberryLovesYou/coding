@@ -14,7 +14,7 @@ from string import punctuation
 
 LETTERS = ascii_letters #52 chars
 NUMBERS = digits #10 chars
-SPECIAL_CHARACTERS = punctuation.replace(":", "") #32 chars
+SPECIAL_CHARACTERS = punctuation.replace(":", "") #32 chars. Getting rid of the colon because it is the seperator in the password file
 
 def generate_password(password_length, letters=True, numbers=True, special=True):
     if not letters and not numbers and not special:
@@ -45,4 +45,9 @@ def generate_password(password_length, letters=True, numbers=True, special=True)
     password_string = ""
     for i in password:
         password_string += i
-    return password_string
+    return password_stringdef main():
+
+    print(generate_password(password_length=3, letters=True, numbers=False, special=True, characters_occurring_at_least_once=True))
+
+if __name__ == "__main__":
+    main()
