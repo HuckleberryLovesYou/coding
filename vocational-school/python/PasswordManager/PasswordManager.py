@@ -77,12 +77,11 @@ def add(letters=True, numbers=True, special=True, characters_occurring_at_least_
     if title_column_count == 0 and username_column_count == 0 and password_column_count == 0:
         password_length = kwargs.get("password_length")
         if password_length != None:
-            if password_length.isdigit():
+            try:
                 password_length = int(password_length)
                 password = PasswordGenerator.generate_password(password_length, letters=letters, numbers=numbers, special=special, characters_occurring_at_least_once=characters_occurring_at_least_once)
-            else:
-                raise Exception(f"expected type int, got {type(password_length)} in password_length instead")
-
+            except ValueError:
+                raise Exception(f"Expected type int for password_length but got {type(password_length)} instead")
 
         existing_indices = get_all_indices()
         try:

@@ -11,7 +11,7 @@
 
 # DO NOT USE IT TO STORE ANY IMPORTANT DATA
 # THIS IS JUST A FUN PROJECT NOT MEANT TO BE USED
-
+from time import sleep
 import customtkinter
 import PasswordManager
 import PasswordManagerCryptography
@@ -147,7 +147,6 @@ def root_gui():
                 decrypt_error_label = customtkinter.CTkLabel(master=master_password_frame, text="Error:\nDatabase already decrypted or invalid Key")
                 decrypt_error_label.pack(side="bottom", padx=10, pady=30)
                 decrypt_error_label.after(1500, decrypt_error_label.destroy)
-                print("Error in call_decrypt")
 
         master_password_frame = customtkinter.CTkFrame(master=root)
         master_password_frame.pack(pady=20, padx=20, fill="both", expand=True)
@@ -243,6 +242,7 @@ def root_gui():
 
         def check_for_generate():
             def call_add_with_generate():
+                # is used to add a new entry with password generation
                 password_length: int = round(password_length_slider.get())
 
                 password_length_slider.destroy()
@@ -254,9 +254,12 @@ def root_gui():
                 index_label = customtkinter.CTkLabel(master=add_frame, text=f"Added password at index {index}, with password {password}")
                 index_label.pack(side="bottom", padx=10, pady=30)
                 index_label.after(5000, index_label.destroy)
-                add_entry_button.pack(padx=10, pady=10)
+
+                sleep(2)
+                back_to_root()
 
             def call_add():
+                # is used to add a new entry without password generation
                 index, password = PasswordManager.add(title=title_entry.get(), username=username_entry.get(), password=password_entry.get())
                 index_label = customtkinter.CTkLabel(master=add_frame, text=f"Added password at index {index}")
                 index_label.pack(side="bottom", padx=10, pady=30)

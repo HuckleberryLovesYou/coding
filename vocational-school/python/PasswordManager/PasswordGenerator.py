@@ -17,7 +17,7 @@ NUMBERS = digits #10 chars
 SPECIAL_CHARACTERS = punctuation.replace(":", "") #32 chars. Getting rid of the colon because it is the seperator in the password file
 
 
-def generate_password(password_length, letters=True, numbers=True, special=True, characters_occurring_at_least_once=True):
+def generate_password(password_length: int, letters=True, numbers=True, special=True, characters_occurring_at_least_once=True):
     def is_character_occurring_at_least_once(password_to_check) -> bool:
         if letters:
             is_character_lower_letter = []
@@ -93,7 +93,6 @@ def generate_password(password_length, letters=True, numbers=True, special=True,
 
     password_length: int = round(password_length)  # handles float inputs by rounding it to no decimal places
     if password_length < min_password_length:
-        print(f"Password length must be at least {min_password_length}")
         raise Exception(f"Password length must be at least {min_password_length}")
 
     password = generate()
