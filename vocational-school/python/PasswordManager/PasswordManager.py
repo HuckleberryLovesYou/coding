@@ -12,7 +12,7 @@
 # DO NOT USE IT TO STORE ANY IMPORTANT DATA
 
 from os.path import exists
-from PasswordGenerator import generate_password
+import PasswordGenerator
 from tkinter.filedialog import askopenfilename
 import PasswordManagerCryptography
 import argparse
@@ -66,7 +66,7 @@ def view() -> list[str]:
             return view_list
 
 
-def add(letters=True, numbers=True, special=True, **kwargs): #TODO: sort the output by index
+def add(letters=True, numbers=True, special=True, characters_occurring_at_least_once=False, **kwargs): #TODO: sort the output by index
     """If password_length is specified password is overwritten"""
     title: str = kwargs.get("title")
     title_column_count = title.count(":")
@@ -79,7 +79,7 @@ def add(letters=True, numbers=True, special=True, **kwargs): #TODO: sort the out
         if password_length != None:
             if password_length.isdigit():
                 password_length = int(password_length)
-                password = generate_password(password_length, letters=letters, numbers=numbers, special=special)
+                password = PasswordGenerator.generate_password(password_length, letters=letters, numbers=numbers, special=special, characters_occurring_at_least_once=characters_occurring_at_least_once)
             else:
                 raise Exception(f"expected type int, got {type(password_length)} in password_length instead")
 
@@ -232,9 +232,14 @@ def main():
                             configure_password_generation = input("Configure password generation? [y/n]: ").lower()
 
                         if configure_password_generation == "y":
-                            generate_letters = input("Enable the generation of letters? [y/n]: ").lower()
+                            generate_letters = input("Enable the generation of letters (lowercase and uppercase)? [y/n]: ").lower()
                             generate_numbers = input("Enable the generation of numbers? [y/n]: ").lower()
                             generate_special_characters = input("Enable the generation of special characters? [y/n]: ").lower()
+
+                            characters_must_occur_once_bool: bool = False
+                            characters_must_occur_once = input("Force at least one occurrences of above characters? [y/n]: ").lower()
+                            if characters_must_occur_once == "y":
+                                characters_must_occur_once_bool = True
 
                             generate_letters_bool: bool = False
                             generate_numbers_bool: bool = False
@@ -251,7 +256,7 @@ def main():
 
                             while True:
                                 generate_password_length = input("Enter password length [8-inf]: ")
-                                index, generated_password = add(title=title, username=username, password_length=generate_password_length, letters=generate_letters_bool, numbers=generate_numbers_bool, special=generate_special_characters_bool)
+                                index, generated_password = add(title=title, username=username, password_length=generate_password_length, letters=generate_letters_bool, numbers=generate_numbers_bool, special=generate_special_characters_bool, characters_occurring_at_least_once=characters_must_occur_once_bool)
                                 break
 
                         else:
