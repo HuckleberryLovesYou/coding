@@ -10,7 +10,6 @@
 #tkinter
 
 # DO NOT USE IT TO STORE ANY IMPORTANT DATA
-# NO ENCRYPTION HAPPENING HERE
 
 from os.path import exists
 from PasswordGenerator import generate_password
@@ -20,7 +19,7 @@ import argparse
 
 global_filename: str = ""
 
-def get_filepath(): #let the user select a .txt-file and writes it into global_filename
+def get_filepath() -> tuple[str, bool]: #let the user select a .txt-file and writes it into global_filename
     def check_for_file(filepath, set_global_filename=False): #checks if file actually exists (might not be needed)
         if exists(filepath):
             print("Database found")
@@ -33,18 +32,30 @@ def get_filepath(): #let the user select a .txt-file and writes it into global_f
     return global_filename, check_for_file(global_filename)
 
 
-
-def count_lines():
+def get_all_indices() -> list[str]:
+    all_indices = []
     with open(global_filename, "r") as passwords_file:
-        amount_of_lines: int = 0
-        for _ in passwords_file.readlines():
-            amount_of_lines += 1
-        return amount_of_lines
+        lines = passwords_file.readlines()
+        for line in lines:
+            index_to_append: str = ""
+            i = 0
+            while line[i].isdigit():
+                index_to_append += f"{line[i]}"
+                i += 1
+            all_indices.append(index_to_append)
+    return all_indices
 
 
-def view():
+def view() -> list[str]:
+    """The view function reads the contents of the password database file.
+    If there are no lines in the database file, it raises an exception and returns None.
+    Else it appends a fancied up representation of the password database file to the returned list.
+
+    :returns: a list of strings or None, if there are no lines in the database file
+    :raises: Exception, if there are no lines in the database file
+    """
     view_list = []
-    if count_lines() == 0:
+    if len(get_all_indices()) == 0:
         view_list.append("There are no entries in your database")
         return view_list
     else:
@@ -55,7 +66,7 @@ def view():
             return view_list
 
 
-def add(letters=True, numbers=True, special=True, **kwargs):
+def add(letters=True, numbers=True, special=True, **kwargs): #TODO: sort the output by index
     """If password_length is specified password is overwritten"""
     title: str = kwargs.get("title")
     title_column_count = title.count(":")
@@ -70,47 +81,28 @@ def add(letters=True, numbers=True, special=True, **kwargs):
                 password_length = int(password_length)
                 password = generate_password(password_length, letters=letters, numbers=numbers, special=special)
             else:
-                raise TypeError(f"expected type int, got {type(password_length)} in password_length instead")
+                raise Exception(f"expected type int, got {type(password_length)} in password_length instead")
 
 
-        existing_indexes = []
-        with open(global_filename, "r") as passwords_file:
-            lines = passwords_file.readlines()
-            for line in lines: #TODO: Find a better way to make more indexes possible (current solution goes up to index 9999)
-                index_to_append: str = ""
-                index_to_append += f"{line[0]}"
-                if line[1].isdigit():
-                    index_to_append += f"{line[1]}"
-                    if line[2].isdigit():
-                        index_to_append += f"{line[2]}"
-                        if line[3].isdigit():
-                            index_to_append += f"{line[3]}"
-                existing_indexes.append(index_to_append)
+        existing_indices = get_all_indices()
         try:
-            index = int(existing_indexes[-1]) + 1
+            index = int(existing_indices[-1]) + 1
         except IndexError:
             index = 1
+
         with open(global_filename, "a") as passwords_file:
             passwords_file.write(f"{index}:{title}:{username}:{password}\n")
         print(f"Entry added at index {index}")
         return index, password
     else:
-        raise TypeError("Found column in string")
+        raise Exception("Found column in string")
 
 
 
-def remove(index_to_remove: int): #TODO: Find a better way to make more indexes possible (current solution goes up to index 9999)
-    existing_indexes = []
+def remove(index_to_remove: int):
     with open(global_filename, "r") as passwords_file:
         lines = passwords_file.readlines()
-        for line in lines:
-            index_to_append: str = ""
-            index_to_append += f"{line[0]}"
-            if line[1].isdigit():
-                index_to_append += f"{line[1]}"
-                if line[2].isdigit():
-                    index_to_append += f"{line[2]}"
-            existing_indexes.append(index_to_append)
+    existing_indexes = get_all_indices()
     try:
         line_to_remove = existing_indexes.index(str(index_to_remove))
         del lines[line_to_remove]
@@ -125,9 +117,25 @@ def remove(index_to_remove: int): #TODO: Find a better way to make more indexes 
 
 
 def main():
-    def encrypt_and_quit():
+    def encrypt_and_quit(error_message="") -> None:
+        """
+        Encrypt the password database file using the provided master password.
+
+        If an error message is provided, print it and raise an exception.
+        Finally, exit the program.
+
+        :param error_message: An optional error message to be printed before exiting the program. Default is an empty string.
+        :type error_message: str
+
+        :raises: Exception: If an error message is provided.
+
+        :returns: None
+        """
         PasswordManagerCryptography.encrypt_database(global_filename, PasswordManagerCryptography.convert_master_password_to_key(master_password))
-        print("Database encrypted")
+        if len(error_message) > 0:
+            print("Error occurred")
+            print("Database encrypted")
+            raise Exception(f"{error_message}")
         exit("User ended the program")
 
 
@@ -149,7 +157,6 @@ def main():
         args = parser.parse_args()
 
         cli_args_given = True
-        print(args)
 
     except:
         print("No arguments found\nUsing interactive mode instead")
@@ -287,8 +294,6 @@ def main():
                     print("Enter a valid mode")
                     if cli_args_given:
                         encrypt_and_quit()
-                    else:
-                        continue
 
 
 
