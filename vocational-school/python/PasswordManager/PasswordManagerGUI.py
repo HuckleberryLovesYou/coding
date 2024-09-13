@@ -218,7 +218,7 @@ def root_gui():
         view_title_label = customtkinter.CTkLabel(master=view_frame, text="Password Manger", font=("Ariel", 28))
         view_title_label.pack(pady=20, padx=20)
 
-        lines = PasswordManager.count_lines()
+        lines = len(PasswordManager.get_all_indices())
         show_total_lines_label = customtkinter.CTkLabel(master=view_frame, text=f"Total lines: {lines}", fg_color="transparent")
         show_total_lines_label.pack(anchor="ne", pady=30, padx=20)
 
