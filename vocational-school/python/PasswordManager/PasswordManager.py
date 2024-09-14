@@ -21,7 +21,7 @@ global_filename: str = ""
 
 def get_filepath() -> tuple[str, bool]: #let the user select a .txt-file and writes it into global_filename
     def check_for_file(filepath, set_global_filename=False): #checks if file actually exists (might not be needed)
-        if exists(filepath):
+        if exists(filepath): # imported from os.path
             print("Database found")
             return True
         else:
@@ -46,7 +46,7 @@ def get_all_indices() -> list[str]:
     return all_indices
 
 
-def view() -> list[str]:
+def view() -> dict[int, str]: #TODO: annotate
     """The view function reads the contents of the password database file.
     If there are no lines in the database file, it raises an exception and returns None.
     Else it appends a fancied up representation of the password database file to the returned list.
@@ -54,25 +54,25 @@ def view() -> list[str]:
     :returns: a list of strings or None, if there are no lines in the database file
     :raises: Exception, if there are no lines in the database file
     """
-    view_list = []
+    password_dict = {}
     if len(get_all_indices()) == 0:
-        view_list.append("There are no entries in your database")
-        return view_list
+        password_dict[0] = {"There are no entries in your database"}
+        return password_dict
     else:
         with open(global_filename, "r") as passwords_file:
             for line in passwords_file.readlines():
                 index, title, username, password = line.split(":")
-                view_list.append(f"{index}:\t\tTitle: {title}\tUsername: {username} \tPassword: {password}\n")
-            return view_list
+                password_dict[int(index)] = f"Title: {title}\tUsername: {username} \tPassword: {password}\n" # converts index to an integer to be sorted correctly in the next line
+        return dict(sorted(password_dict.items())) # returns a dictionary sorted be the entire key of type int and the corresponding title, username and password
 
 
-def add(letters=True, numbers=True, special=True, characters_occurring_at_least_once=False, **kwargs): #TODO: sort the output by index
+def add(letters=True, numbers=True, special=True, characters_occurring_at_least_once=False, **kwargs) -> list[int, str] | None:
     """If password_length is specified password is overwritten"""
     title: str = kwargs.get("title")
     title_column_count = title.count(":")
-    username = kwargs.get("username")
+    username: str = kwargs.get("username")
     username_column_count = title.count(":")
-    password = kwargs.get("password")
+    password: str = kwargs.get("password")
     password_column_count = title.count(":")
     if title_column_count == 0 and username_column_count == 0 and password_column_count == 0:
         password_length = kwargs.get("password_length")
@@ -81,20 +81,25 @@ def add(letters=True, numbers=True, special=True, characters_occurring_at_least_
                 password_length = int(password_length)
                 password = PasswordGenerator.generate_password(password_length, letters=letters, numbers=numbers, special=special, characters_occurring_at_least_once=characters_occurring_at_least_once)
             except ValueError:
-                raise Exception(f"Expected type int for password_length but got {type(password_length)} instead")
+                raise ValueError(f"Expected type int for password_length but got {type(password_length)} instead")
 
         existing_indices = get_all_indices()
-        try:
-            index = int(existing_indices[-1]) + 1
-        except IndexError:
-            index = 1
+        int_existing_indices: list[int] = []
+        for i in existing_indices:
+            int_existing_indices.append(int(i))
+
+        highest_index: int = max(int_existing_indices)
+        for i in range(1, highest_index + 2):
+            if i not in int_existing_indices:
+                index = i
+                break
 
         with open(global_filename, "a") as passwords_file:
             passwords_file.write(f"{index}:{title}:{username}:{password}\n")
         print(f"Entry added at index {index}")
         return index, password
     else:
-        raise Exception("Found column in string")
+        raise Exception("Found column in string. Columns are not supported.")
 
 
 
@@ -131,9 +136,9 @@ def main():
         :returns: None
         """
         PasswordManagerCryptography.encrypt_database(global_filename, PasswordManagerCryptography.convert_master_password_to_key(master_password))
+        print("Database encrypted")
         if len(error_message) > 0:
-            print("Error occurred")
-            print("Database encrypted")
+            print("Error occurred!")
             raise Exception(f"{error_message}")
         exit("User ended the program")
 
@@ -205,9 +210,10 @@ def main():
                     mode = input("Choose mode [view/add/remove/q to quit]: ").lower()
 
                 if mode == "view":
-                    view_list = view()
-                    for line in view_list:
-                        print(line)
+                    view_dict = view()
+                    print(view_dict)
+                    for key in view_dict.keys():
+                        print(f"{key}:\t\t{view_dict[key]}\n")
                     if cli_args_given:
                         encrypt_and_quit()
                 elif mode == "add":
