@@ -1,4 +1,4 @@
-import random as r
+from random import randint
 from string import ascii_letters
 from string import digits
 from string import punctuation
@@ -17,7 +17,30 @@ NUMBERS = digits #10 chars
 SPECIAL_CHARACTERS = punctuation.replace(":", "") #32 chars. Getting rid of the colon because it is the seperator in the password file
 
 
-def generate_password(password_length: int, letters=True, numbers=True, special=True, characters_occurring_at_least_once=True):
+def generate_password(password_length: int, letters=True, numbers=True, special=True, characters_occurring_at_least_once=True) -> str:
+    """
+    Generates a random password based on the given parameters. It is using the random.randint method of the random module.
+    The chances of generating a letter, number, or special are equal. The chances for each character in its own specification are equal as well.
+    If characters_occurring_at_least_once is True, it also checks for the minimum required length. The minimum required length depends on the specified criteria in the function call.
+    It starts at 0. The amount of characters added to the minimum required length is documented below at each parameter.
+
+    If characters_occurring_at_least_once is False, the minimum required length is 1.
+
+    :param password_length: The desired length of the password.
+    :param letters: Whether to include letters in the password. Default is True. Adds 2 to the minimum required length.
+    :param numbers: Whether to include numbers in the password. Default is True. Adds 1 to the minimum required length.
+    :param special: Whether to include special characters in the password. Default is True. Adds 1 to the minimum required length.
+    :param characters_occurring_at_least_once: Whether to ensure that each character type (lowercase letter, uppercase letter, numbers, special) occurs at least once in the password. Default is True.
+
+    :return: A random password that meets the specified criteria.
+
+    :raises Exception: If the password length is less than the minimum required length. The minimum required length changes depending on the specified criteria in the function call. If no character types are selected (letters, numbers, special) it raises an exception as well.
+
+    :Example:
+
+    >>> generate_password(password_length=10, letters=True, numbers=True, special=True, characters_occurring_at_least_once=True)
+    'P8b$h3R9&j'
+    """
     def is_character_occurring_at_least_once(password_to_check) -> bool:
         if letters:
             is_character_lower_letter = []
@@ -56,21 +79,21 @@ def generate_password(password_length: int, letters=True, numbers=True, special=
         password = ""
         current_password_length: int = 0
         while password_length > current_password_length:
-            list_choice = r.randint(0, 2)  # generates a value between 0 and 2. This is used to generate evenly often usage of letters, numbers and special characters
+            list_choice = randint(0, 2)  # generates a value between 0 and 2. This is used to generate evenly often usage of letters, numbers and special characters
             if list_choice == 0:  # LETTERS string has value 0
                 if letters:
-                    character = LETTERS[r.randint(0, len(LETTERS) - 1)]
+                    character = LETTERS[randint(0, len(LETTERS) - 1)]
                     password += character
                     current_password_length += 1
 
             elif list_choice == 1:  # NUMBERS string has value 1
                 if numbers:
-                    character = NUMBERS[r.randint(0, len(NUMBERS) - 1)]
+                    character = NUMBERS[randint(0, len(NUMBERS) - 1)]
                     password += character
                     current_password_length += 1
             else:
                 if special:  # SPECIAL_CHARACTERS string has value 2
-                    character = SPECIAL_CHARACTERS[r.randint(0, len(SPECIAL_CHARACTERS) - 1)]
+                    character = SPECIAL_CHARACTERS[randint(0, len(SPECIAL_CHARACTERS) - 1)]
                     password += character
                     current_password_length += 1
         return password
