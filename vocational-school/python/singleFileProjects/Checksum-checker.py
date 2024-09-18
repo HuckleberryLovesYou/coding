@@ -1,32 +1,28 @@
-while True:
-    save_first_checksum = None
-    while not (save_first_checksum == "y" or save_first_checksum == "n"):
-        save_first_checksum: str = input("save first checksum?[y/n]:\t")
-    checksum1: str = input("Please enter your first checksum in here:\n\n")
-    checksum1_counter = 1
-    if save_first_checksum.lower() == "y":
-        counter = 1
-        while counter == 1:
-            checksum2: str = input("Please enter your second checksum in here:\n\n")
-            if checksum1 == checksum2:
-                print("Die Checksums sind identisch\n\n\n\n\n")
-                counter = 0
-            else:
-                print("Die Checksums sind **!NICHT GLEICH!**\nVersuche es erneut. Deine erste Checksum wurde gespeichert.")
+def is_same(checksum1, checksum2) -> bool:
+    evaluation: bool = checksum1 == checksum2
+    if evaluation:
+        print("The checksums are identical.")
     else:
-        if checksum1_counter == 1:
-            checksum2: str = input("Please enter your second checksum in here:\n\n")
-            if checksum1 == checksum2:
-                print("Die Checksums sind identisch\n\n\n\n\n")
-                counter = 0
-            else:
-                print("Die Checksums sind **!NICHT GLEICH!**\n")
-            checksum1_counter = 0
+        print("The checksums are **NOT** identical.")
+    return evaluation
+
+def main() -> None:
+    while True:
+        checksum_1: str = input("Enter first checksum: ")
+
+        save_first_checksum: str = ""
+        while not (save_first_checksum == "y" or save_first_checksum == "n"):
+            save_first_checksum = input("save first checksum?[y/n]: ").lower()
+
+        if save_first_checksum == "y":
+            while True:
+                checksum_2: str = input("Enter second checksum: ")
+                if is_same(checksum_1, checksum_2):
+                    break
         else:
-            checksum1 = str(input("Please enter your first checksum in here:\n\n"))
-            checksum2 = str(input("Please enter your second checksum in here:\n\n"))
-            if checksum1 == checksum2:
-                print("Die Checksums sind identisch\n\n\n\n\n")
-                counter = 0
-            else:
-                print("Die Checksums sind **!NICHT GLEICH!**\nVersuche es erneut.")
+            checksum_2: str = input("Enter second checksum: ")
+            is_same(checksum_1, checksum_2)
+
+
+if __name__ == "__main__":
+    main()

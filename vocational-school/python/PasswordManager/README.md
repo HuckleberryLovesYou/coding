@@ -1,3 +1,4 @@
+# Deprecated
 # Password Manager
 ## Usage
 It can be used with GUI or only CLI. The main file is PasswordManager.py, is the file, which is producing the CLI-output and so need to be run if CLI is the wanted Output method.
