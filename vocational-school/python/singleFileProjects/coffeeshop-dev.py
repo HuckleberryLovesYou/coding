@@ -1,9 +1,4 @@
-# import stuff
-import math
-import os
 import time
-
-
 
 # setting variables
 base_price = 4
@@ -11,11 +6,10 @@ whipped_cream_price = 2
 Espresso_dopio_price = 3
 good_deeds_requirement = 4
 menu = ["Coffee" , "Latte" , "Espresso" , "Cappucino"]
-menu.sort()
+
 Yes_or_No = ["Yes" , "No"]
 unwanted_Names = ["Ben" , "Patricia" , "Loki"]
 
-#time.*() start
 time_start = time.time()
 entrance_time = time.asctime()
 
@@ -26,15 +20,17 @@ while len(name) <= 2:
 
 # Name input and check, if name = unwanted
 if name in unwanted_Names:
-    evil_status  = ""
+    evil_status = ""
     while not evil_status in Yes_or_No:
         evil_status = input("Are you evil, " + name + "?\nAnswer with Yes or No\n")
     while True:
-        try:
-            good_deeds = int(input("How many good deeds have you done today, " + name + "?\n"))
+        good_deeds: str = input("How many good deeds have you done today, " + name + "?\n")
+        if good_deeds.isdigit():
+            good_deeds = int(good_deeds)
             break
-        except:
+        else:
             print("That's not a valid number(only int)!")
+
     if evil_status == "Yes" and good_deeds < good_deeds_requirement:
         print("We dont want ya here Evil " + name + "!")
         exit()
@@ -45,13 +41,13 @@ else:
 
 costumer_wish = ""
 while not costumer_wish in menu:
-    for x in menu:
-        print(x)
+    for item in menu:
+        print(item)
     costumer_wish = input("What ya want?\n")
-    if not costumer_wish in menu:
-        print("Sorry, we don't have " + str(costumer_wish) + " here! Please choose something from above.\n")
-    else:
+    if costumer_wish in menu:
         print("Okay! Got it!\n\n")
+    else:
+        print("Sorry, we don't have " + str(costumer_wish) + " here! Please choose something from above.\n")
 
 amount = 0
 while amount < 1:
@@ -78,7 +74,7 @@ elif costumer_wish == "Espresso":
     price = base_price * 1.75
     # setting prices depending on espresso dopio true or false
     Espresso_dopio = input("Would you like to have to a Espresso dopio instead?\nAnswer with Yes or No!\n")
-    if  Espresso_dopio == "Yes":
+    if Espresso_dopio == "Yes":
         price = Espresso_dopio_price + price
         print("You ordered a Espresso dopio for a price of " + str(Espresso_dopio_price) + "€s !")
     else:
@@ -97,33 +93,22 @@ else:
     print(name + ", your " + str(amount) + " " + costumer_wish + " is gettin made right neow.\nNow ya just gotta pay " + str(total_price) + "€s")
 
 
-
-payment1 = 0
-payment2 = 0
-while payment1 == 0:
-    try:
-        payment1 = int(input("Enter the amount of money your paying here:\n"))
-        break
-    except:
-        print("That's not a valid number(only int)!")
-
-
-# check if payment is right
-while payment1 != total_price or payment1 + payment2 != total_price:
-    if payment1 > total_price:
-        Overpayment = payment1 - total_price
-        print("You paid me " + str(Overpayment) + "€ too much!\nAnd there are your " + str(Overpayment) + "€s back!")
+price_paid: int = 0
+while total_price != price_paid:
+    payment = input("Enter the amount you want to pay: ")
+    if payment.isdigit():
+        payment = int(payment)
+    else:
+        print("That's not a valid number!")
+        continue
+    price_paid += payment
+    if price_paid < total_price:
+        print("You need to pay " + str(total_price - price_paid) + " more.")
+    elif price_paid > total_price:
+        print(f"You paid {str(price_paid - total_price)} too much. Here is the change.")
         break
     else:
-        Underpayment = total_price - payment1
-        while Underpayment != payment2:
-            Underpayment = total_price - payment1
-            print("You paid me " + str(Underpayment) +"€ too less")
-            try:
-                payment2 = int(input("Enter the remaining amount which you have to pay:\n"))
-            except:
-                print("That's not a valid number(only int)!")
-        print("Thanks for your correct payment!")
+        print("Thank you for paying!")
         break
 
 
@@ -138,24 +123,9 @@ if amount >= 2:  #check if plural or singular
 else:
     print("There ya go, " + name + "!\nHere's ya " + str(amount) + " " + costumer_wish + "! \nHave a good one!")
 
+
 leave_time = time.asctime()
-
-#calculating time_spent in background
 time_end = time.time()
-time_spent = time_end - time_start
-print("\n\nNerd-Stats:\nTime spent in our coffe shop:\t\t" + str(round(time_spent)) + " seconds")
-print("You enterd our coffe shop at:\t\t" + str(entrance_time))
+print("\n\nYou enterd our coffe shop at:\t\t" + str(entrance_time))
 print("You left our coffe shop at:\t\t\t" + str(leave_time))
-
-
-
-
-
-#missing_item = input("In that Time.\nDid you experience any missing item on our menu?\nAnswer with Yes or No!\n")
-#if missing_item == "Yes":
-#    menu.append(input("Please enter it here:\n"))
-#    print("Your item " + menu[-1] + " got added to our menu")
-# else:
-#    exit()
-#
-# print("Next time your gonna see " + missing_item + " in the menu as well!")
+print("Nerd-Stats:\nTime spent in our coffe shop:\t\t" + str(round(time_end - time_start)) + " seconds")
